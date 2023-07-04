@@ -11,7 +11,7 @@
 
 function addSwithButton() {
   const buttonArea = document.createElement("div");
-  buttonArea.innerHTML = '<button id="userscript-auto-reload-button" type="button" style="position: absolute; top: 0; left: 0">ON</button>';
+  buttonArea.innerHTML = '<button id="userscript-auto-reload-button" type="button" style="position: absolute; top: 0; left: 0">OFF</button>';
   buttonArea.setAttribute("id", "userscript-button-container");
   const mainElement = document.getElementsByTagName("main");
   if (mainElement.length > 0) {
@@ -23,7 +23,7 @@ function addSwithButton() {
   const button = document.getElementById("userscript-auto-reload-button")
   button.addEventListener("click", () => {
     isStart = !isStart;
-    button.textContent = isStart ? "OFF" : "OFF→ON";
+    button.textContent = isStart ? "OFF" : "ON";
     alert(isStart ? "自動読み込みを開始します" : "自動読み込みを停止します");
   }, false);
 }
