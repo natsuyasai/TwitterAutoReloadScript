@@ -20,7 +20,7 @@ const SELECTED_LIST_ID = "userscript-interval-setting";
 function addStyle() {
   const css = `
 #${BUTTON_ID} {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 44px;
@@ -29,7 +29,7 @@ function addStyle() {
   overflow: hidden;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-  border: none; 
+  border: none;
   text-align: center;
   background-color: #03A9F4;
   color: white;
@@ -37,13 +37,13 @@ function addStyle() {
 #${BUTTON_ID} :hover {
   box-shadow: 1px 6px 15px rgba(0,0,0,0.5);
 }
- 
+
 #${BUTTON_ID}:focus {
   outline: none;
 }
 
 #${SELECTED_LIST_ID} {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 54px;
   height: 20px;
@@ -51,15 +51,15 @@ function addStyle() {
   overflow: hidden;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-  border: none; 
+  border: none;
   text-align: center;
   background-color: #03A9F4;
   color: white;
 }
 `;
-const styleElement = document.createElement("style");
-styleElement.innerHTML = css;
-document.head.append(styleElement);
+  const styleElement = document.createElement("style");
+  styleElement.innerHTML = css;
+  document.head.append(styleElement);
 }
 
 /**
@@ -89,7 +89,7 @@ function addSwithButton() {
  */
 function addIntervalSetting() {
   const IntervalSecond = Object.freeze({
-    0: 5 ,
+    0: 5,
     1: 10,
     2: 15,
     3: 30,
@@ -97,16 +97,16 @@ function addIntervalSetting() {
     5: 60,
     6: 120,
     7: 180,
-  });  
+  });
   const selectedListArea = document.createElement("div");
   selectedListArea.innerHTML = `
   <select  id="${SELECTED_LIST_ID}" name="setting" size="1">
       <option value="0">5秒</option>
       <option value="1">10秒</option>
       <option value="2">15秒</option>
-      <option value="3" selected> 30秒</option>
+      <option value="3"> 30秒</option>
       <option value="4"> 45秒</option>
-      <option value="5"> 1分</option>
+      <option value="5" selected> 1分</option>
       <option value="6"> 2分</option>
       <option value="7"> 3分</option>
   </select>`
@@ -146,12 +146,25 @@ function reSelectTab() {
   }
 }
 
+/**
+ * スクロールしているか
+ * @returns 
+ */
+function isScrolling() {
+  return document.scrollingElement.scrollTop > 0;
+}
+
+/**
+ * 周期リセット
+ * @param {*} intervalSecond 
+ */
 function restartInterval(intervalSecond) {
-  if (timerId > 0){
+  if (timerId > 0) {
     clearInterval(timerId);
   }
   timerId = setInterval(() => {
-    if (isStart) {
+    // 停止またはスクロール中なら処理しない
+    if (isStart && !isScrolling()) {
       reSelectTab();
     }
   }, 1000 * intervalSecond);
@@ -164,5 +177,5 @@ let timerId = -1;
   addSwithButton();
   addIntervalSetting();
   addStyle();
-  restartInterval(30);
+  restartInterval(60);
 })();
