@@ -1,13 +1,14 @@
 // ==UserScript==
-// @name         twitter自動読み込み
-// @namespace    http://tampermonkey.net/
+// @name         Twitter自動読み込み
+// @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
 // @version      0.3
-// @description
+// @description  Twitterのホーム画面で一定周期で最新取得処理を実行します。
 // @author       natsuyasai
 // @match        https://twitter.com/home
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // ==/UserScript==
+'use strict';
 
 const BUTTON_ELEMENT_ROOT_ID = "userscript-button-container";
 const BUTTON_ID = "userscript-auto-reload-button";
@@ -156,7 +157,7 @@ function reSelectTab() {
 
 /**
  * スクロールしているか
- * @returns 
+ * @returns
  */
 function isScrolling() {
   return document.scrollingElement.scrollTop > 0;
@@ -164,7 +165,7 @@ function isScrolling() {
 
 /**
  * 周期リセット
- * @param {*} intervalSecond 
+ * @param {*} intervalSecond
  */
 function restartInterval(intervalSecond) {
   if (timerId > 0) {
@@ -181,7 +182,6 @@ function restartInterval(intervalSecond) {
 let isStart = true;
 let timerId = -1;
 (function () {
-  'use strict';
   addSwithButton();
   addIntervalSetting();
   addStyle();
