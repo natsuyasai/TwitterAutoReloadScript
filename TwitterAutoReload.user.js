@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.3.0
+// @version      1.3.2
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com/*
@@ -327,12 +327,12 @@ function watchURLChange() {
       isStart = false;
     }
     changeStatus(isStart);
-  }, 200);
+  }, 500);
   const observer = new MutationObserver(debounced);
   const mainElement = document.getElementsByTagName('main');
   const config = {childList: true, subtree: true};
   if (mainElement.length > 0) {
-    observer.observe(mainElement, config);
+    observer.observe(mainElement[0], config);
   } else {
     setTimeout(() => {
       watchURLChange();
@@ -355,9 +355,7 @@ function init() {
 
 // eslint-disable-next-line space-before-function-paren
 (function () {
-  if (location.href === 'https://twitter.com/' || location.href.indexOf('https://twitter.com/home') >= 0) {
-    init();
-  }
+  init();
   watchURLChange();
 })();
 
