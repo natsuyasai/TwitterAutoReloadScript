@@ -5,7 +5,6 @@
 // @description  Twitterのホーム画面で一定周期で最新取得処理を実行します。
 // @author       natsuyasai
 // @match        https://twitter.com/home
-// eslint-disable-next-line max-len
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/blob/main/TwitterAutoReload.user.js
@@ -14,20 +13,46 @@
 // ==/UserScript==
 'use strict';
 
+const ROOT_CONTAINER = 'userscript-root-container';
 const BUTTON_ELEMENT_ROOT_ID = 'userscript-button-container';
 const BUTTON_ID = 'userscript-auto-reload-button';
 const SELECLTED_ELEMENT_ROOT_ID = 'userscript-selected-container';
 const SELECTED_LIST_ID = 'userscript-interval-setting';
+const STATUS_ELEMENT_ROOT_ID = 'userscript-status-container';
+const STATUS_ID = 'userscript-auto-reload-status';
 
 /**
  * スタイル適用
  */
 function addStyle() {
   const css = `
-#${BUTTON_ID} {
+
+#${ROOT_CONTAINER} {
   position: fixed;
+  display: flex;
   top: 0;
   left: 0;
+}
+
+#${BUTTON_ELEMENT_ROOT_ID},
+#${SELECLTED_ELEMENT_ROOT_ID},
+#${STATUS_ELEMENT_ROOT_ID} {
+  position: relative;
+}
+
+#${STATUS_ELEMENT_ROOT_ID} {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+#${STATUS_ID} {
+  margin: 0 2px 0 4px;
+  color: lightgreen;
+}
+
+#${BUTTON_ID} {
+  position: relative;
   width: 44px;
   height: 20px;
   margin: 0.3em;
@@ -49,9 +74,7 @@ function addStyle() {
 }
 
 #${SELECTED_LIST_ID} {
-  position: fixed;
-  top: 0;
-  left: 54px;
+  position: relative;
   height: 20px;
   margin: 0.3em;
   overflow: hidden;
@@ -75,26 +98,75 @@ function addStyle() {
   document.head.append(styleElement);
 }
 
+/**
+ * ルート要素追加
+ */
+function addRootContainer() {
+  const rootArea = document.createElement('div');
+  rootArea.setAttribute('id', ROOT_CONTAINER);
+  const mainElement = document.getElementsByTagName('main');
+  if (mainElement.length > 0) {
+    mainElement[0].appendChild(rootArea);
+  } else {
+    document.body.appendChild(rootArea);
+  }
+}
+
+/**
+ * コンテンツ登録
+ * @param {HTMLElement} element 追加要素
+ */
+function setContent(element) {
+  const rootElement = document.getElementById(ROOT_CONTAINER);
+  if (rootElement) {
+    rootElement.appendChild(element);
+  } else {
+    document.body.appendChild(element);
+  }
+}
+
+/**
+ * ステータス表示追加
+ */
+function addStatus() {
+  const statusArea = document.createElement('div');
+  statusArea.setAttribute('id', STATUS_ELEMENT_ROOT_ID);
+  statusArea.innerHTML = `<span id="${STATUS_ID}">●</span>`;
+  setContent(statusArea);
+}
+
+/**
+ * ステータス変更
+ * @param {boolean} isStart ＯＮ状態か
+ */
+function changeStatus(isStart) {
+  const statusElement = document.getElementById(STATUS_ID);
+  if (!statusElement) {
+    return;
+  }
+  if (isStart) {
+    statusElement.style.color = 'lightgreen';
+  } else {
+    statusElement.style.color = 'lightgray';
+  }
+}
+
 
 /**
  * 切り替えボタン追加
  */
 function addSwithButton() {
   const buttonArea = document.createElement('div');
-  buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">OFF</button>`;
   buttonArea.setAttribute('id', BUTTON_ELEMENT_ROOT_ID);
-  const mainElement = document.getElementsByTagName('main');
-  if (mainElement.length > 0) {
-    mainElement[0].appendChild(buttonArea);
-  } else {
-    document.body.appendChild(buttonArea);
-  }
+  buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">OFF</button>`;
+  setContent(buttonArea);
 
   const button = document.getElementById(BUTTON_ID);
   button.addEventListener('click', () => {
     isStart = !isStart;
     button.textContent = isStart ? 'OFF' : 'ON';
     alert(isStart ? 'Start Auto Reload.' : 'Stop Auto Reload.');
+    changeStatus(isStart);
   }, false);
 }
 
@@ -113,6 +185,7 @@ function addIntervalSetting() {
     7: 180,
   });
   const selectedListArea = document.createElement('div');
+  selectedListArea.setAttribute('id', SELECLTED_ELEMENT_ROOT_ID);
   selectedListArea.innerHTML = `
   <select  id="${SELECTED_LIST_ID}" name="setting" size="1">
       <option value="0">5秒</option>
@@ -124,13 +197,7 @@ function addIntervalSetting() {
       <option value="6"> 2分</option>
       <option value="7"> 3分</option>
   </select>`;
-  selectedListArea.setAttribute('id', SELECLTED_ELEMENT_ROOT_ID);
-  const mainElement = document.getElementsByTagName('main');
-  if (mainElement.length > 0) {
-    mainElement[0].appendChild(selectedListArea);
-  } else {
-    document.body.appendChild(selectedListArea);
-  }
+  setContent(selectedListArea);
 
   const listElement = document.getElementById(SELECTED_LIST_ID);
   listElement.addEventListener('change', (event) => {
@@ -168,6 +235,21 @@ function isScrolling() {
   return document.scrollingElement.scrollTop > 0;
 }
 
+/**
+ * スクロールイベント登録
+ */
+function addScrollEvent() {
+  window.addEventListener('scroll', () => {
+    if (!isStart) {
+      return;
+    }
+    if (isScrolling()) {
+      changeStatus(false);
+    } else {
+      changeStatus(true);
+    }
+  });
+}
 
 /**
  * 周期リセット
@@ -187,9 +269,13 @@ function restartInterval(intervalSecond) {
 
 let isStart = true;
 let timerId = -1;
-(function() {
+// eslint-disable-next-line space-before-function-paren
+(function () {
+  addRootContainer();
+  addStatus();
   addSwithButton();
   addIntervalSetting();
   addStyle();
+  addScrollEvent();
   restartInterval(60);
 })();
