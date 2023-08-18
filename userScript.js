@@ -33,13 +33,14 @@ function addStyle() {
   text-align: center;
   background-color: #03A9F4;
   color: white;
+  cursor: pointer;
+  transition: 0.3s;
 }
-#${BUTTON_ID} :hover {
-  box-shadow: 1px 6px 15px rgba(0,0,0,0.5);
+#${BUTTON_ID}:hover {
+  opacity: 0.7;
 }
 
 #${BUTTON_ID}:focus {
-  outline: none;
 }
 
 #${SELECTED_LIST_ID} {
@@ -55,7 +56,14 @@ function addStyle() {
   text-align: center;
   background-color: #03A9F4;
   color: white;
+  cursor: pointer;
+  transition: 0.3s;
 }
+
+#${SELECTED_LIST_ID}:hover {
+  opacity: 0.7;
+}
+
 `;
   const styleElement = document.createElement("style");
   styleElement.innerHTML = css;
