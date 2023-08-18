@@ -8,6 +8,7 @@
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
+// @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
 // @license MIT
 // ==/UserScript==
 'use strict';
