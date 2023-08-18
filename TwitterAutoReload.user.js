@@ -5,15 +5,16 @@
 // @description  Twitterのホーム画面で一定周期で最新取得処理を実行します。
 // @author       natsuyasai
 // @match        https://twitter.com/home
+// eslint-disable-next-line max-len
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // ==/UserScript==
 'use strict';
 
-const BUTTON_ELEMENT_ROOT_ID = "userscript-button-container";
-const BUTTON_ID = "userscript-auto-reload-button";
-const SELECLTED_ELEMENT_ROOT_ID = "userscript-selected-container";
-const SELECTED_LIST_ID = "userscript-interval-setting";
+const BUTTON_ELEMENT_ROOT_ID = 'userscript-button-container';
+const BUTTON_ID = 'userscript-auto-reload-button';
+const SELECLTED_ELEMENT_ROOT_ID = 'userscript-selected-container';
+const SELECTED_LIST_ID = 'userscript-interval-setting';
 
 /**
  * スタイル適用
@@ -66,19 +67,20 @@ function addStyle() {
 }
 
 `;
-  const styleElement = document.createElement("style");
+  const styleElement = document.createElement('style');
   styleElement.innerHTML = css;
   document.head.append(styleElement);
 }
+
 
 /**
  * 切り替えボタン追加
  */
 function addSwithButton() {
-  const buttonArea = document.createElement("div");
-  buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">OFF</button>`
-  buttonArea.setAttribute("id", BUTTON_ELEMENT_ROOT_ID);
-  const mainElement = document.getElementsByTagName("main");
+  const buttonArea = document.createElement('div');
+  buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">OFF</button>`;
+  buttonArea.setAttribute('id', BUTTON_ELEMENT_ROOT_ID);
+  const mainElement = document.getElementsByTagName('main');
   if (mainElement.length > 0) {
     mainElement[0].appendChild(buttonArea);
   } else {
@@ -86,10 +88,10 @@ function addSwithButton() {
   }
 
   const button = document.getElementById(BUTTON_ID);
-  button.addEventListener("click", () => {
+  button.addEventListener('click', () => {
     isStart = !isStart;
-    button.textContent = isStart ? "OFF" : "ON";
-    alert(isStart ? "自動読み込みを開始します" : "自動読み込みを停止します");
+    button.textContent = isStart ? 'OFF' : 'ON';
+    alert(isStart ? 'Start Auto Reload.' : 'Stop Auto Reload.');
   }, false);
 }
 
@@ -107,7 +109,7 @@ function addIntervalSetting() {
     6: 120,
     7: 180,
   });
-  const selectedListArea = document.createElement("div");
+  const selectedListArea = document.createElement('div');
   selectedListArea.innerHTML = `
   <select  id="${SELECTED_LIST_ID}" name="setting" size="1">
       <option value="0">5秒</option>
@@ -118,9 +120,9 @@ function addIntervalSetting() {
       <option value="5" selected> 1分</option>
       <option value="6"> 2分</option>
       <option value="7"> 3分</option>
-  </select>`
-  selectedListArea.setAttribute("id", SELECLTED_ELEMENT_ROOT_ID);
-  const mainElement = document.getElementsByTagName("main");
+  </select>`;
+  selectedListArea.setAttribute('id', SELECLTED_ELEMENT_ROOT_ID);
+  const mainElement = document.getElementsByTagName('main');
   if (mainElement.length > 0) {
     mainElement[0].appendChild(selectedListArea);
   } else {
@@ -128,7 +130,7 @@ function addIntervalSetting() {
   }
 
   const listElement = document.getElementById(SELECTED_LIST_ID);
-  listElement.addEventListener("change", (event) => {
+  listElement.addEventListener('change', (event) => {
     const value = parseInt(event.currentTarget.value, 10);
     const intervalSecond = IntervalSecond[value];
     restartInterval(intervalSecond);
@@ -140,14 +142,14 @@ function addIntervalSetting() {
  */
 function reSelectTab() {
   // aタグの中からタグ要素かつ現在アクティブになっている要素を取得し、クリックイベントを発火させる
-  const tab = document.getElementsByTagName("a");
+  const tab = document.getElementsByTagName('a');
   for (let i = 0; i < tab.length; i++) {
     const elem = tab[i];
-    const isTab = elem.hasAttribute("role") && elem.getAttribute("role") === "tab";
+    const isTab = elem.hasAttribute('role') && elem.getAttribute('role') === 'tab';
     if (!isTab) {
       continue;
     }
-    const isSelectedTabElement = elem.hasAttribute("aria-selected") && elem.getAttribute("aria-selected") === "true";
+    const isSelectedTabElement = elem.hasAttribute('aria-selected') && elem.getAttribute('aria-selected') === 'true';
     if (!isSelectedTabElement) {
       continue;
     }
@@ -157,15 +159,16 @@ function reSelectTab() {
 
 /**
  * スクロールしているか
- * @returns
+ * @return {boolean} true スクロール中 false  一番上にいる
  */
 function isScrolling() {
   return document.scrollingElement.scrollTop > 0;
 }
 
+
 /**
  * 周期リセット
- * @param {*} intervalSecond
+ * @param {number} intervalSecond
  */
 function restartInterval(intervalSecond) {
   if (timerId > 0) {
@@ -181,7 +184,7 @@ function restartInterval(intervalSecond) {
 
 let isStart = true;
 let timerId = -1;
-(function () {
+(function() {
   addSwithButton();
   addIntervalSetting();
   addStyle();

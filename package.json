@@ -1,0 +1,21 @@
+{
+  "name": "twitterautoreloadscript",
+  "version": "0.3.0",
+  "description": "Twitterの公式のホーム画面で自動更新モドキを行うスクリプト",
+  "main": "TwitterAutoReload.user.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natsuyasai/TwitterAutoReloadScript.git"
+  },
+  "author": "natsuyasai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/natsuyasai/TwitterAutoReloadScript/issues"
+  },
+  "homepage": "https://github.com/natsuyasai/TwitterAutoReloadScript#readme",
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}
