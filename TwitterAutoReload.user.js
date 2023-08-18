@@ -1,14 +1,12 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.2.0
+// @version      1.2.1
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
-// @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/blob/main/TwitterAutoReload.user.js
-// @downloadURL  https://github.com/natsuyasai/TwitterAutoReloadScript/blob/main/TwitterAutoReload.user.js
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
 // @license MIT
 // ==/UserScript==
@@ -325,7 +323,7 @@ function restartInterval(intervalSecond) {
 function watchURLChange() {
   const debounced = debounce(() => {
     if (location.href === 'https://twitter.com/' || location.href.indexOf('https://twitter.com/home') >= 0) {
-      isStart = true;
+      isStart = isScrolling() ? false : true;
     } else {
       isStart = false;
     }
