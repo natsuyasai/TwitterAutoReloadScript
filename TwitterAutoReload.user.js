@@ -10,6 +10,7 @@
 // @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/blob/main/TwitterAutoReload.user.js
 // @downloadURL  https://github.com/natsuyasai/TwitterAutoReloadScript/blob/main/TwitterAutoReload.user.js
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
+// @license MIT
 // ==/UserScript==
 'use strict';
 
