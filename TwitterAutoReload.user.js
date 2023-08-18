@@ -38,9 +38,6 @@ function addStyle() {
 #${SELECLTED_ELEMENT_ROOT_ID},
 #${STATUS_ELEMENT_ROOT_ID} {
   position: relative;
-}
-
-#${STATUS_ELEMENT_ROOT_ID} {
   display: flex;
   align-items: center;
   text-align: center;
@@ -49,6 +46,14 @@ function addStyle() {
 #${STATUS_ID} {
   margin: 0 2px 0 4px;
   color: lightgreen;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  appearance: none;
+  font-size: 32px;
+  line-height: 1;
 }
 
 #${BUTTON_ID} {
@@ -104,12 +109,7 @@ function addStyle() {
 function addRootContainer() {
   const rootArea = document.createElement('div');
   rootArea.setAttribute('id', ROOT_CONTAINER);
-  const mainElement = document.getElementsByTagName('main');
-  if (mainElement.length > 0) {
-    mainElement[0].appendChild(rootArea);
-  } else {
-    document.body.appendChild(rootArea);
-  }
+  document.body.appendChild(rootArea);
 }
 
 /**
@@ -125,14 +125,34 @@ function setContent(element) {
   }
 }
 
+let visibility = true;
 /**
  * ステータス表示追加
  */
 function addStatus() {
   const statusArea = document.createElement('div');
   statusArea.setAttribute('id', STATUS_ELEMENT_ROOT_ID);
-  statusArea.innerHTML = `<span id="${STATUS_ID}">●</span>`;
+  statusArea.innerHTML = `<button id="${STATUS_ID}">●</button>`;
   setContent(statusArea);
+
+  const status = document.getElementById(STATUS_ID);
+  if (status) {
+    status.addEventListener('click', () => {
+      const button = document.getElementById(BUTTON_ELEMENT_ROOT_ID);
+      const selecter = document.getElementById(SELECLTED_ELEMENT_ROOT_ID);
+
+      if (button && selecter) {
+        if (visibility) {
+          button.style.display = 'none';
+          selecter.style.display = 'none';
+        } else {
+          button.style.display = 'initial';
+          selecter.style.display = 'initial';
+        }
+      }
+      visibility = !visibility;
+    }, false);
+  }
 }
 
 /**
