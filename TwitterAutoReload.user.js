@@ -1,16 +1,15 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.3.3
+// @version      1.3.5
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
-// @match        https://twitter.com/*
+// @match        https://twitter.com
 // @match        https://twitter.com/home
+// @match        https://twitter.com/notifications
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
-// @downloadURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
-// @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
 // @license MIT
 // ==/UserScript==
 'use strict';
@@ -324,16 +323,11 @@ function restartInterval(intervalSecond) {
  */
 function watchURLChange() {
   const debounced = debounce(() => {
-    if (location.href === 'https://twitter.com/' || location.href.indexOf('https://twitter.com/home') >= 0) {
-      isStart = isScrolling() ? false : true;
-    } else {
-      isStart = false;
-    }
-    changeStatus(isStart);
+    chnageURLState();
   }, 500);
   const observer = new MutationObserver(debounced);
   const mainElement = document.getElementsByTagName('main');
-  const config = {childList: true, subtree: true};
+  const config = { childList: true, subtree: true };
   if (mainElement.length > 0) {
     observer.observe(mainElement[0], config);
   } else {
@@ -341,6 +335,20 @@ function watchURLChange() {
       watchURLChange();
     }, 1000);
   }
+}
+
+/**
+ * URLに基づいたステータス更新
+ */
+function chnageURLState() {
+  if (location.href === 'https://twitter.com/' ||
+    location.href.indexOf('https://twitter.com/home') >= 0 ||
+    location.href.indexOf('https://twitter.com/notifications') >= 0) {
+    isStart = isScrolling() ? false : true;
+  } else {
+    isStart = false;
+  }
+  changeStatus(isStart);
 }
 
 /**
@@ -359,6 +367,7 @@ function init() {
 // eslint-disable-next-line space-before-function-paren
 (function () {
   init();
+  chnageURLState();
   watchURLChange();
 })();
 
