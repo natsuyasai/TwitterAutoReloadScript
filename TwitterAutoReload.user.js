@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.3.2
+// @version      1.3.3
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com/*
+// @match        https://twitter.com/home
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
+// @downloadURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
 // @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
 // @license MIT
 // ==/UserScript==
