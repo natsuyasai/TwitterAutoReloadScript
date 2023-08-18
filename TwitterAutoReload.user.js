@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.1.0
+// @version      1.2.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
-// @match        https://twitter.com/home
+// @match        https://twitter.com/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/blob/main/TwitterAutoReload.user.js
@@ -21,6 +21,10 @@ const SELECLTED_ELEMENT_ROOT_ID = 'userscript-selected-container';
 const SELECTED_LIST_ID = 'userscript-interval-setting';
 const STATUS_ELEMENT_ROOT_ID = 'userscript-status-container';
 const STATUS_ID = 'userscript-auto-reload-status';
+
+let currentInterval = 60;
+let isStart = true;
+let timerId = -1;
 
 /**
  * スタイル適用
@@ -229,6 +233,7 @@ function addIntervalSetting() {
     const value = parseInt(event.currentTarget.value, 10);
     const intervalSecond = IntervalSecond[value];
     restartInterval(intervalSecond);
+    currentInterval = intervalSecond;
   }, false);
 }
 
@@ -313,15 +318,48 @@ function restartInterval(intervalSecond) {
   }, 1000 * intervalSecond);
 }
 
-let isStart = true;
-let timerId = -1;
-// eslint-disable-next-line space-before-function-paren
-(function () {
+/**
+ * URL変更検知
+ * DOM要素の変更を検知してURLが変わったかを確認する
+ */
+function watchURLChange() {
+  const debounced = debounce(() => {
+    if (location.href === 'https://twitter.com/' || location.href.indexOf('https://twitter.com/home') >= 0) {
+      isStart = true;
+    } else {
+      isStart = false;
+    }
+    changeStatus(isStart);
+  }, 200);
+  const observer = new MutationObserver(debounced);
+  const mainElement = document.getElementsByTagName('main');
+  const config = {childList: true, subtree: true};
+  if (mainElement.length > 0) {
+    observer.observe(mainElement, config);
+  } else {
+    observer.observe(document.body, config);
+  }
+}
+
+/**
+ * 初期設定
+ */
+function init() {
   addRootContainer();
   addStatus();
   addSwithButton();
   addIntervalSetting();
   addStyle();
   addScrollEvent();
-  restartInterval(60);
+  restartInterval(currentInterval);
+}
+
+// eslint-disable-next-line space-before-function-paren
+(function () {
+  if (location.href === 'https://twitter.com/' || location.href.indexOf('https://twitter.com/home') >= 0) {
+    init();
+  }
+  watchURLChange();
 })();
+
+
