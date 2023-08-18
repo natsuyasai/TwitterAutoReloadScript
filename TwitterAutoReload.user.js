@@ -239,7 +239,7 @@ function isScrolling() {
  * スクロールイベント登録
  */
 function addScrollEvent() {
-  window.addEventListener('scroll', () => {
+  const debounced = debounce(() => {
     if (!isStart) {
       return;
     }
@@ -248,7 +248,28 @@ function addScrollEvent() {
     } else {
       changeStatus(true);
     }
-  });
+  }, 500);
+  window.addEventListener('scroll', debounced);
+}
+
+/**
+ * debounce
+ * @param {*} func 実行する関数
+ * @param {number} delay 遅延時間
+ * @return {*} debounce処理
+ */
+function debounce(func, delay) {
+  let timerId;
+
+  // eslint-disable-next-line space-before-function-paren
+  return function (...args) {
+    clearTimeout(timerId);
+
+    timerId = setTimeout(() => {
+      // eslint-disable-next-line no-invalid-this
+      func.apply(this, args);
+    }, delay);
+  };
 }
 
 /**
