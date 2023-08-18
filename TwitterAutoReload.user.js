@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.2.1
+// @version      1.3.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com/*
@@ -164,13 +164,16 @@ function addStatus() {
  */
 function changeStatus(isStart) {
   const statusElement = document.getElementById(STATUS_ID);
-  if (!statusElement) {
-    return;
+  if (statusElement) {
+    if (isStart) {
+      statusElement.style.color = 'lightgreen';
+    } else {
+      statusElement.style.color = 'lightgray';
+    }
   }
-  if (isStart) {
-    statusElement.style.color = 'lightgreen';
-  } else {
-    statusElement.style.color = 'lightgray';
+  const button = document.getElementById(BUTTON_ID);
+  if (button) {
+    button.textContent = isStart ? 'OFF' : 'ON';
   }
 }
 
@@ -186,9 +189,7 @@ function addSwithButton() {
 
   const button = document.getElementById(BUTTON_ID);
   button.addEventListener('click', () => {
-    isStart = !isStart;
-    button.textContent = isStart ? 'OFF' : 'ON';
-    alert(isStart ? 'Start Auto Reload.' : 'Stop Auto Reload.');
+    isStart = isScrolling() ? false : !isStart;
     changeStatus(isStart);
   }, false);
 }
@@ -268,14 +269,12 @@ function isScrolling() {
  */
 function addScrollEvent() {
   const debounced = debounce(() => {
-    if (!isStart) {
-      return;
-    }
     if (isScrolling()) {
-      changeStatus(false);
+      isStart = false;
     } else {
-      changeStatus(true);
+      isStart = true;
     }
+    changeStatus(isStart);
   }, 500);
   window.addEventListener('scroll', debounced);
 }
@@ -335,7 +334,9 @@ function watchURLChange() {
   if (mainElement.length > 0) {
     observer.observe(mainElement, config);
   } else {
-    observer.observe(document.body, config);
+    setTimeout(() => {
+      watchURLChange();
+    }, 1000);
   }
 }
 
