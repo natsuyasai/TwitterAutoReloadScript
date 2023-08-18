@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter自動読み込み
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      0.3
+// @version      1.0.0
 // @description  Twitterのホーム画面で一定周期で最新取得処理を実行します。
 // @author       natsuyasai
 // @match        https://twitter.com/home
