@@ -1,6 +1,6 @@
 {
   "name": "twitterautoreloadscript",
-  "version": "1.2.0",
+  "version": "1.0.0",
   "description": "Twitterの公式のホーム画面で自動更新モドキを行うスクリプト",
   "main": "TwitterAutoReload.user.js",
   "scripts": {},
