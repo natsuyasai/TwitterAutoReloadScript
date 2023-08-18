@@ -203,6 +203,8 @@ function addIntervalSetting() {
     5: 60,
     6: 120,
     7: 180,
+    8: 300,
+    9: 600,
   });
   const selectedListArea = document.createElement('div');
   selectedListArea.setAttribute('id', SELECLTED_ELEMENT_ROOT_ID);
@@ -216,6 +218,8 @@ function addIntervalSetting() {
       <option value="5" selected> 1分</option>
       <option value="6"> 2分</option>
       <option value="7"> 3分</option>
+      <option value="8"> 5分</option>
+      <option value="9"> 10分</option>
   </select>`;
   setContent(selectedListArea);
 
