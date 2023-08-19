@@ -326,7 +326,7 @@ function watchURLChange() {
   }, 500);
   const observer = new MutationObserver(debounced);
   const mainElement = document.getElementsByTagName('main');
-  const config = { childList: true, subtree: true };
+  const config = {childList: true, subtree: true};
   if (mainElement.length > 0) {
     observer.observe(mainElement[0], config);
   } else {
