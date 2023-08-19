@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.3.6
+// @version      1.3.7
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com
@@ -11,10 +11,7 @@
 // @grant        none
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
 // @license MIT
-// @downloadURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
-// @updateURL    https://github.com/natsuyasai/TwitterAutoReloadScript/raw/main/TwitterAutoReload.user.js
 // ==/UserScript==
-'use strict';
 
 const ROOT_CONTAINER = 'userscript-root-container';
 const BUTTON_ELEMENT_ROOT_ID = 'userscript-button-container';
@@ -368,6 +365,7 @@ function init() {
 
 // eslint-disable-next-line space-before-function-paren
 (function () {
+  'use strict';
   init();
   chnageURLState();
   watchURLChange();
