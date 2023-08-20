@@ -16,6 +16,9 @@
   "homepage": "https://github.com/natsuyasai/TwitterAutoReloadScript#readme",
   "devDependencies": {
     "eslint": "^8.47.0",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.2"
   }
 }

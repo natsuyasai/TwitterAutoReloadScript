@@ -289,12 +289,10 @@ function addScrollEvent() {
 function debounce(func, delay) {
   let timerId;
 
-  // eslint-disable-next-line space-before-function-paren
-  return function (...args) {
+  return function(...args) {
     clearTimeout(timerId);
 
     timerId = setTimeout(() => {
-      // eslint-disable-next-line no-invalid-this
       func.apply(this, args);
     }, delay);
   };
@@ -363,8 +361,7 @@ function init() {
   restartInterval(currentInterval);
 }
 
-// eslint-disable-next-line space-before-function-paren
-(function () {
+(function() {
   'use strict';
   init();
   chnageURLState();
