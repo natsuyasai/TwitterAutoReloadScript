@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.3.9
+// @version      1.4.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com
@@ -22,7 +22,8 @@ const STATUS_ELEMENT_ROOT_ID = 'userscript-status-container';
 const STATUS_ID = 'userscript-auto-reload-status';
 
 let currentInterval = 60;
-let isStart = true;
+let isEnabled = true;
+let isStoped = false;
 let timerId = -1;
 
 /**
@@ -163,18 +164,14 @@ function addStatus() {
  * ステータス変更
  * @param {boolean} isStart ＯＮ状態か
  */
-function changeStatus(isStart) {
+function changeStatus(isEnabled) {
   const statusElement = document.getElementById(STATUS_ID);
   if (statusElement) {
-    if (isStart) {
+    if (isEnabled) {
       statusElement.style.color = 'lightgreen';
     } else {
       statusElement.style.color = 'lightgray';
     }
-  }
-  const button = document.getElementById(BUTTON_ID);
-  if (button) {
-    button.textContent = isStart ? 'OFF' : 'ON';
   }
 }
 
@@ -185,13 +182,14 @@ function changeStatus(isStart) {
 function addSwithButton() {
   const buttonArea = document.createElement('div');
   buttonArea.setAttribute('id', BUTTON_ELEMENT_ROOT_ID);
-  buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">OFF</button>`;
+  buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">ON</button>`;
   setContent(buttonArea);
 
   const button = document.getElementById(BUTTON_ID);
   button.addEventListener('click', () => {
-    isStart = isScrolling() ? false : !isStart;
-    changeStatus(isStart);
+    isStoped = !isStoped;
+    button.textContent = isStoped ? 'OFF' : 'ON';
+    button.style.backgroundColor = isStoped ? 'gray' : '#03A9F4';
   }, false);
 }
 
@@ -240,7 +238,7 @@ function addIntervalSetting() {
 /**
  * メイン処理
  */
-function reSelectTab() {
+function reselectTab() {
   // aタグの中からタグ要素かつ現在アクティブになっている要素を取得し、クリックイベントを発火させる
   const tab = document.getElementsByTagName('a');
   for (let i = 0; i < tab.length; i++) {
@@ -271,11 +269,11 @@ function isScrolling() {
 function addScrollEvent() {
   const debounced = debounce(() => {
     if (isScrolling()) {
-      isStart = false;
+      isEnabled = false;
     } else {
-      isStart = true;
+      isEnabled = true;
     }
-    changeStatus(isStart);
+    changeStatus(isEnabled);
   }, 500);
   window.addEventListener('scroll', debounced);
 }
@@ -289,7 +287,7 @@ function addScrollEvent() {
 function debounce(func, delay) {
   let timerId;
 
-  return function(...args) {
+  return function (...args) {
     clearTimeout(timerId);
 
     timerId = setTimeout(() => {
@@ -308,8 +306,9 @@ function restartInterval(intervalSecond) {
   }
   timerId = setInterval(() => {
     // 停止またはスクロール中なら処理しない
-    if (isStart && !isScrolling()) {
-      reSelectTab();
+    if (isEnabled && !isScrolling() && !isStoped) {
+      console.log('取得');
+      reselectTab();
     }
   }, 1000 * intervalSecond);
 }
@@ -324,7 +323,7 @@ function watchURLChange() {
   }, 500);
   const observer = new MutationObserver(debounced);
   const mainElement = document.getElementsByTagName('main');
-  const config = {childList: true, subtree: true};
+  const config = { childList: true, subtree: true };
   if (mainElement.length > 0) {
     observer.observe(mainElement[0], config);
   } else {
@@ -341,11 +340,11 @@ function chnageURLState() {
   if (location.href === 'https://twitter.com/' ||
     location.href.indexOf('https://twitter.com/home') >= 0 ||
     location.href.indexOf('https://twitter.com/notifications') >= 0) {
-    isStart = isScrolling() ? false : true;
+    isEnabled = isScrolling() ? false : true;
   } else {
-    isStart = false;
+    isEnabled = false;
   }
-  changeStatus(isStart);
+  changeStatus(isEnabled);
 }
 
 /**
@@ -361,7 +360,7 @@ function init() {
   restartInterval(currentInterval);
 }
 
-(function() {
+(function () {
   'use strict';
   init();
   chnageURLState();
