@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.3.8
+// @version      1.3.9
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com
@@ -34,7 +34,7 @@ function addStyle() {
 #${ROOT_CONTAINER} {
   position: fixed;
   display: flex;
-  top: 0;
+  top: 40px;
   left: 0;
 }
 
