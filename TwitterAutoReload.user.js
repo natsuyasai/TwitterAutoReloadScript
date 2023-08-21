@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.4.0
+// @version      1.4.1
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com
@@ -306,10 +306,16 @@ function restartInterval(intervalSecond) {
   }
   timerId = setInterval(() => {
     // 停止またはスクロール中なら処理しない
-    if (isEnabled && !isScrolling() && !isStoped) {
-      console.log('取得');
-      reselectTab();
+    if (isStoped) {
+      return;
     }
+    if (isScrolling()) {
+      return;
+    }
+    if (!isEnabled) {
+      return;
+    }
+    reselectTab();
   }, 1000 * intervalSecond);
 }
 
