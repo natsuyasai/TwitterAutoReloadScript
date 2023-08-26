@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.4.1
+// @version      1.4.2
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://twitter.com
 // @match        https://twitter.com/home
 // @match        https://twitter.com/notifications
+// @match        https://twitter.com/search*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
@@ -162,7 +163,7 @@ function addStatus() {
 
 /**
  * ステータス変更
- * @param {boolean} isStart ＯＮ状態か
+ * @param {boolean} isEnabled ＯＮ状態か
  */
 function changeStatus(isEnabled) {
   const statusElement = document.getElementById(STATUS_ID);
@@ -287,7 +288,7 @@ function addScrollEvent() {
 function debounce(func, delay) {
   let timerId;
 
-  return function (...args) {
+  return function(...args) {
     clearTimeout(timerId);
 
     timerId = setTimeout(() => {
@@ -329,7 +330,7 @@ function watchURLChange() {
   }, 500);
   const observer = new MutationObserver(debounced);
   const mainElement = document.getElementsByTagName('main');
-  const config = { childList: true, subtree: true };
+  const config = {childList: true, subtree: true};
   if (mainElement.length > 0) {
     observer.observe(mainElement[0], config);
   } else {
@@ -343,14 +344,27 @@ function watchURLChange() {
  * URLに基づいたステータス更新
  */
 function chnageURLState() {
-  if (location.href === 'https://twitter.com/' ||
-    location.href.indexOf('https://twitter.com/home') >= 0 ||
-    location.href.indexOf('https://twitter.com/notifications') >= 0) {
+  if (isExecutableURL()) {
     isEnabled = isScrolling() ? false : true;
   } else {
     isEnabled = false;
   }
   changeStatus(isEnabled);
+}
+
+/**
+ * 実行可能なURLか
+ * @return {boolean} 実行可能なURLか
+ */
+function isExecutableURL() {
+  if (location.href === 'https://twitter.com/' ||
+    location.href.indexOf('https://twitter.com/home') >= 0 ||
+    location.href.indexOf('https://twitter.com/notifications') >= 0 ||
+    location.href.indexOf('https://twitter.com/search') >= 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /**
@@ -366,7 +380,7 @@ function init() {
   restartInterval(currentInterval);
 }
 
-(function () {
+(function() {
   'use strict';
   init();
   chnageURLState();
