@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.4.2
+// @version      1.4.3
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
