@@ -4,10 +4,10 @@
 // @version      1.4.2
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
-// @match        https://twitter.com
-// @match        https://twitter.com/home
-// @match        https://twitter.com/notifications
-// @match        https://twitter.com/search*
+// @match        https://x.com
+// @match        https://x.com/home
+// @match        https://x.com/notifications
+// @match        https://x.com/search*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @supportURL   https://github.com/natsuyasai/TwitterAutoReloadScript
@@ -357,10 +357,10 @@ function chnageURLState() {
  * @return {boolean} 実行可能なURLか
  */
 function isExecutableURL() {
-  if (location.href === 'https://twitter.com/' ||
-    location.href.indexOf('https://twitter.com/home') >= 0 ||
-    location.href.indexOf('https://twitter.com/notifications') >= 0 ||
-    location.href.indexOf('https://twitter.com/search') >= 0) {
+  if (location.href === 'https://x.com/' ||
+    location.href.indexOf('https://x.com/home') >= 0 ||
+    location.href.indexOf('https://x.com/notifications') >= 0 ||
+    location.href.indexOf('https://x.com/search') >= 0) {
     return true;
   } else {
     return false;
