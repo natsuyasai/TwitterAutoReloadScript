@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.4.3
+// @version      1.4.4
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -219,10 +219,10 @@ function addIntervalSetting() {
       <option value="2">15秒</option>
       <option value="3"> 30秒</option>
       <option value="4"> 45秒</option>
-      <option value="5" selected> 1分</option>
+      <option value="5"> 1分</option>
       <option value="6"> 2分</option>
       <option value="7"> 3分</option>
-      <option value="8"> 5分</option>
+      <option value="8" selected> 5分</option>
       <option value="9"> 10分</option>
   </select>`;
   setContent(selectedListArea);
@@ -288,7 +288,7 @@ function addScrollEvent() {
 function debounce(func, delay) {
   let timerId;
 
-  return function(...args) {
+  return function (...args) {
     clearTimeout(timerId);
 
     timerId = setTimeout(() => {
@@ -330,7 +330,7 @@ function watchURLChange() {
   }, 500);
   const observer = new MutationObserver(debounced);
   const mainElement = document.getElementsByTagName('main');
-  const config = {childList: true, subtree: true};
+  const config = { childList: true, subtree: true };
   if (mainElement.length > 0) {
     observer.observe(mainElement[0], config);
   } else {
@@ -380,7 +380,7 @@ function init() {
   restartInterval(currentInterval);
 }
 
-(function() {
+(function () {
   'use strict';
   init();
   chnageURLState();
