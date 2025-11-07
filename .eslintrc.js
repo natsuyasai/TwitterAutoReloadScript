@@ -1,28 +1,23 @@
-module.exports = {
-  'env': {
-    'browser': true,
-    'commonjs': true,
-    'es2021': true,
-  },
-  'extends': 'google',
-  'overrides': [
-    {
-      'env': {
-        'node': true,
-      },
-      'files': [
-        '.eslintrc.{js,cjs}',
-      ],
-      'parserOptions': {
-        'sourceType': 'script',
-      },
+import js from 'eslint-config-js';
+import googleConfig from 'eslint-config-google';
+
+export default [
+  js.configs.recommended,
+  googleConfig,
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
-  ],
-  'parserOptions': {
-    'ecmaVersion': 'latest',
+    env: {
+      browser: true,
+      commonjs: true,
+      es2021: true,
+      node: true,
+    },
+    rules: {
+      'max-len': ['error', { code: 120 }],
+      'no-undef': ['error'],
+    },
   },
-  'rules': {
-    'max-len': ['error', {'code': 120}],
-    'no-undef': ['error'],
-  },
-};
+];
