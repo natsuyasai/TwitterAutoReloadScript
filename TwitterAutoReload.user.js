@@ -5,6 +5,7 @@
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
+// @match        https://x.com/
 // @match        https://x.com/home
 // @match        https://x.com/notifications
 // @match        https://x.com/search*
@@ -357,7 +358,8 @@
    * @return {boolean} 実行可能なURLか
    */
   function isExecutableURL() {
-    if (location.href === 'https://x.com/' ||
+    if (location.href === 'https://x.com' ||
+      location.href === 'https://x.com/' ||
       location.href.indexOf('https://x.com/home') >= 0 ||
       location.href.indexOf('https://x.com/notifications') >= 0 ||
       location.href.indexOf('https://x.com/search') >= 0) {
@@ -380,10 +382,17 @@
     restartInterval(currentInterval);
   }
 
-
-  init();
-  chnageURLState();
-  watchURLChange();
+  if (!document.body) {
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+      chnageURLState();
+      watchURLChange();
+    });
+  } else {
+    init();
+    chnageURLState();
+    watchURLChange();
+  }
 })();
 
 
