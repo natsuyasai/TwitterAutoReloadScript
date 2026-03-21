@@ -382,17 +382,9 @@
     restartInterval(currentInterval);
   }
 
-  if (!document.body) {
-    document.addEventListener('DOMContentLoaded', () => {
-      init();
-      chnageURLState();
-      watchURLChange();
-    });
-  } else {
-    init();
-    chnageURLState();
-    watchURLChange();
-  }
+  init();
+  chnageURLState();
+  watchURLChange();
 })();
 
 
