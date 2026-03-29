@@ -469,14 +469,22 @@
     const isNarrow = window.innerWidth <= 1280;
     const val = isNarrow ? 'none' : '';
 
-    // 左サイドバー: 1024px以上の時だけ非表示（モバイル幅ではサイドバーは存在しない）
-    if (window.innerWidth >= 1024) {
-      const banner = document.querySelector('header[role="banner"]');
-      if (banner) {
-        banner.style.visibility = isNarrow ? 'hidden' : '';
-        banner.style.width = isNarrow ? '0' : '';
-        banner.style.minWidth = isNarrow ? '0' : '';
-        banner.style.overflow = isNarrow ? 'hidden' : '';
+    // 左サイドバー: サイドバーが実際に存在する場合のみ非表示
+    // モバイル幅ではheaderはトップバーなので触らない
+    const banner = document.querySelector('header[role="banner"]');
+    if (banner) {
+      // サイドバーにはnav内にa[href="/home"]リンクがある
+      const hasHomeLink = banner.querySelector("a[href='/home']");
+      if (hasHomeLink && isNarrow) {
+        banner.style.visibility = 'hidden';
+        banner.style.width = '0';
+        banner.style.minWidth = '0';
+        banner.style.overflow = 'hidden';
+      } else if (!isNarrow) {
+        banner.style.visibility = '';
+        banner.style.width = '';
+        banner.style.minWidth = '';
+        banner.style.overflow = '';
       }
     }
 
