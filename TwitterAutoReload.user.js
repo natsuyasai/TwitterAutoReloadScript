@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.6.0
+// @version      1.6.1
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -315,20 +315,19 @@
 
   /**
    * 「新しいポストを表示」ボタンを探す
-   * タイムラインセクション内で article の外にある button を対象とする
-   * （ツイートのアクションボタンは article 内にあるため自然に除外される）
-   * テキストに依存しないため多言語環境でも動作する
+   * タイムラインのセル（cellInnerDiv）のうち article を含まないものにある button を対象とする
+   * article を含むセルはツイート本体であり、含まないセルが「新しいポストを表示」ボタンのセルとなる
+   * article の有無だけでは通知タブの「もっと見る」ボタン等を誤検出するため cellInnerDiv を基準にする
    * @return {HTMLButtonElement|null}
    */
   function findNewPostsButton() {
     const section = document.querySelector('section[aria-labelledby]');
     if (!section) return null;
-    const buttons = section.querySelectorAll('button[type="button"]');
-    for (const btn of buttons) {
-      // article の外にある → ツイートのアクションボタン（いいね・リポストなど）ではない
-      if (!btn.closest('article')) {
-        return btn;
-      }
+    const cells = section.querySelectorAll('[data-testid="cellInnerDiv"]');
+    for (const cell of cells) {
+      if (cell.querySelector('article')) continue;
+      const btn = cell.querySelector('button[type="button"]');
+      if (btn) return btn;
     }
     return null;
   }
