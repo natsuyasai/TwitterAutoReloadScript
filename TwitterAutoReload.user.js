@@ -471,31 +471,31 @@
     }
 
     // For you / Following タブバー・投稿エリアの非表示
-    // DOM構造をデバッグ出力して正しいセレクタを特定する
-    if (isNarrow) {
-      const tablist = document.querySelector("[role='tablist']");
-      if (tablist) {
-        console.log('[userscript] tablist found. Path:');
-        let el = tablist;
-        const path = [];
-        while (el) {
-          const testid = el.getAttribute?.('data-testid') || '';
-          const role = el.getAttribute?.('role') || '';
-          const tag = el.tagName || '';
-          path.unshift(`${tag}${testid ? '[data-testid='+testid+']' : ''}${role ? '[role='+role+']' : ''}`);
-          el = el.parentElement;
+    // 各要素から親を遡り、タイムラインと同じ親を共有する階層を見つけて非表示にする
+    const hideByWalkingUp = (startEl) => {
+      if (!startEl) return;
+      let target = startEl;
+      while (target.parentElement) {
+        // 親の子要素の中にタイムラインのセルがあるか確認
+        const parent = target.parentElement;
+        for (const sibling of parent.children) {
+          if (sibling !== target && sibling.querySelector("[data-testid='cellInnerDiv']")) {
+            // 兄弟にタイムラインがある = このtargetが非表示にすべきブロック
+            target.style.display = val;
+            return;
+          }
         }
-        console.log('[userscript] ' + path.join(' > '));
+        // role=main に到達したら安全弁として停止
+        if (parent.getAttribute('role') === 'main') {
+          target.style.display = val;
+          return;
+        }
+        target = parent;
       }
-      const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
-      if (tweetBox) {
-        console.log('[userscript] tweetTextarea found');
-      } else {
-        console.log('[userscript] tweetTextarea NOT found');
-      }
-      const primaryCol = document.querySelector("[data-testid='primaryColumn']");
-      console.log('[userscript] primaryColumn:', primaryCol ? 'found' : 'NOT found');
-    }
+    };
+
+    hideByWalkingUp(document.querySelector("[role='tablist']"));
+    hideByWalkingUp(document.querySelector("[data-testid='tweetTextarea_0']"));
 
     // フローティングPostボタン
     const postBtn = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
