@@ -478,7 +478,18 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // TODO: タブバー・投稿エリアの非表示は一旦無効化（原因切り分け）
+    // === デバッグ: 1つずつ有効化して原因を特定 ===
+
+    // STEP 1: nav[role=navigation] だけ非表示
+    const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
+    if (tabNav) {
+      console.log('[userscript] STEP1: hiding nav[role=navigation]');
+      tabNav.style.display = val;
+    } else {
+      console.log('[userscript] STEP1: nav not found');
+    }
+
+    // STEP 2, 3, 4 は次の確認後に追加
 
     // フローティングPostボタン
     const postBtn = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
