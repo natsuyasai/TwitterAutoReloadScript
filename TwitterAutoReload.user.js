@@ -478,18 +478,42 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // === デバッグ: 1つずつ有効化して原因を特定 ===
+    // === デバッグ: DOM構造を詳細に出力 ===
+    if (isNarrow) {
+      const describeEl = (el) => {
+        if (!el) return 'null';
+        const tag = el.tagName;
+        const testid = el.getAttribute('data-testid') || '';
+        const role = el.getAttribute('role') || '';
+        const childCount = el.children.length;
+        return `${tag}${testid ? '[testid='+testid+']' : ''}${role ? '[role='+role+']' : ''}(children:${childCount})`;
+      };
 
-    // STEP 1: nav[role=navigation] だけ非表示
-    const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
-    if (tabNav) {
-      console.log('[userscript] STEP1: hiding nav[role=navigation]');
-      tabNav.style.display = val;
-    } else {
-      console.log('[userscript] STEP1: nav not found');
+      // primaryColumnの直接の子要素を調査
+      const pc = document.querySelector("[data-testid='primaryColumn']");
+      if (pc) {
+        console.log('[userscript] primaryColumn children:');
+        for (let i = 0; i < pc.children.length; i++) {
+          const child = pc.children[i];
+          const hasTimeline = !!child.querySelector("[data-testid='cellInnerDiv']");
+          const hasTablist = !!child.querySelector("[role='tablist']");
+          const hasTweetBox = !!child.querySelector("[data-testid='tweetTextarea_0']");
+          const hasToolbar = !!child.querySelector("[data-testid='toolBar']");
+          console.log(`[userscript]   [${i}] ${describeEl(child)} timeline:${hasTimeline} tablist:${hasTablist} tweetBox:${hasTweetBox} toolbar:${hasToolbar}`);
+
+          // この子要素のさらに直接の子も出力
+          for (let j = 0; j < child.children.length; j++) {
+            const grandchild = child.children[j];
+            const gcTimeline = !!grandchild.querySelector("[data-testid='cellInnerDiv']");
+            const gcTablist = !!grandchild.querySelector("[role='tablist']");
+            const gcTweetBox = !!grandchild.querySelector("[data-testid='tweetTextarea_0']");
+            console.log(`[userscript]     [${i}.${j}] ${describeEl(grandchild)} timeline:${gcTimeline} tablist:${gcTablist} tweetBox:${gcTweetBox}`);
+          }
+        }
+      } else {
+        console.log('[userscript] primaryColumn NOT found');
+      }
     }
-
-    // STEP 2, 3, 4 は次の確認後に追加
 
     // フローティングPostボタン
     const postBtn = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
