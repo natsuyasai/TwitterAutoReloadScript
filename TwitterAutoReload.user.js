@@ -469,21 +469,36 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // primaryColumn内のタブバー・投稿エリアをまとめて処理
-    const primaryColumn = document.querySelector("[data-testid='primaryColumn']");
-    if (primaryColumn) {
-      // primaryColumnの直下の子要素を走査
-      const children = primaryColumn.children;
-      for (const child of children) {
-        // タイムライン本体（cellInnerDiv を含む）はスキップ
-        if (child.querySelector("[data-testid='cellInnerDiv']")) continue;
-        // タブバーまたは投稿エリアを含む要素を非表示
-        const hasTablist = child.querySelector("[role='tablist']");
-        const hasTweetBox = child.querySelector("[data-testid='tweetTextarea_0']");
-        if (hasTablist || hasTweetBox) {
-          child.style.display = val;
+    // For you / Following タブバー: tablist要素とその全祖先を
+    // primaryColumn内で見つかるまで遡って非表示にする
+    const tablist = document.querySelector("[data-testid='primaryColumn'] [role='tablist']");
+    if (tablist) {
+      let target = tablist;
+      while (target.parentElement) {
+        const parent = target.parentElement;
+        // primaryColumnの直接の子に到達したらそれを非表示にして終了
+        if (parent.getAttribute('data-testid') === 'primaryColumn') {
+          target.style.display = val;
+          break;
         }
+        target = parent;
       }
+      target.style.display = val;
+    }
+
+    // 投稿エリア: 同様にprimaryColumnの直接の子まで遡る
+    const tweetBox = document.querySelector("[data-testid='primaryColumn'] [data-testid='tweetTextarea_0']");
+    if (tweetBox) {
+      let target = tweetBox;
+      while (target.parentElement) {
+        const parent = target.parentElement;
+        if (parent.getAttribute('data-testid') === 'primaryColumn') {
+          target.style.display = val;
+          break;
+        }
+        target = parent;
+      }
+      target.style.display = val;
     }
 
     // フローティングPostボタン
