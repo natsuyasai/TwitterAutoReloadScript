@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.7.0
+// @version      1.6.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -314,12 +314,57 @@
   }
 
   /**
+   * 「新しいポストを表示」ボタンを探す
+   * タイムラインセクション内で article の外にある button を対象とする
+   * （ツイートのアクションボタンは article 内にあるため自然に除外される）
+   * テキストに依存しないため多言語環境でも動作する
+   * @return {HTMLButtonElement|null}
+   */
+  function findNewPostsButton() {
+    const section = document.querySelector('section[aria-labelledby]');
+    if (!section) return null;
+    const buttons = section.querySelectorAll('button[type="button"]');
+    for (const btn of buttons) {
+      // article の外にある → ツイートのアクションボタン（いいね・リポストなど）ではない
+      if (!btn.closest('article')) {
+        return btn;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 「新しいポストを表示」ボタンが出現するのを待ってクリックする
+   * MutationObserver でボタンの出現を監視し、見つかり次第クリックする
+   * 最大5秒待機してタイムアウトする
+   */
+  function waitAndClickNewPostsButton() {
+    const btn = findNewPostsButton();
+    if (btn) {
+      btn.click();
+      return;
+    }
+    const section = document.querySelector('section[aria-labelledby]');
+    if (!section) return;
+    const observer = new MutationObserver(() => {
+      const found = findNewPostsButton();
+      if (found) {
+        observer.disconnect();
+        found.click();
+      }
+    });
+    observer.observe(section, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 5000);
+  }
+
+  /**
    * フォロー中タブの更新を誘発する
    * フォーカスイベントを発火してX内部のrevalidateOnFocusを誘発する
+   * 新しいポストがあればボタンが出現するので自動クリックする
    */
   function triggerFollowingRefresh() {
     window.dispatchEvent(new Event('focus'));
-    console.log('Triggered following tab refresh');
+    waitAndClickNewPostsButton();
   }
 
   /**
