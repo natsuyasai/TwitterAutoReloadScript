@@ -456,42 +456,21 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // For you / Following タブバー（tablist + 上位の固定ヘッダー）
-    const tablist = document.querySelector("div[role='main'] [role='tablist']");
-    if (tablist) {
-      // tablist → 親 → 祖父 まで遡って非表示にする（背景・下線・パディング含む）
-      let target = tablist;
-      for (let i = 0; i < 3; i++) {
-        if (target.parentElement && target.parentElement.getAttribute('role') !== 'main') {
-          target = target.parentElement;
-        } else {
-          break;
+    // primaryColumn内のタブバー・投稿エリアをまとめて処理
+    const primaryColumn = document.querySelector("[data-testid='primaryColumn']");
+    if (primaryColumn) {
+      // primaryColumnの直下の子要素を走査
+      const children = primaryColumn.children;
+      for (const child of children) {
+        // タイムライン本体（cellInnerDiv を含む）はスキップ
+        if (child.querySelector("[data-testid='cellInnerDiv']")) continue;
+        // タブバーまたは投稿エリアを含む要素を非表示
+        const hasTablist = child.querySelector("[role='tablist']");
+        const hasTweetBox = child.querySelector("[data-testid='tweetTextarea_0']");
+        if (hasTablist || hasTweetBox) {
+          child.style.display = val;
         }
       }
-      target.style.display = val;
-    }
-
-    // 投稿エリア全体（テキストボックス + ツールバー + Postボタン）
-    const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
-    if (tweetBox) {
-      // DOMを遡って、タイムラインのセル(cellInnerDiv)と同階層の要素を見つける
-      let block = tweetBox;
-      while (block.parentElement) {
-        block = block.parentElement;
-        // このブロックの兄弟にタイムラインがあれば、ここが投稿エリアの境界
-        const siblings = block.parentElement ? block.parentElement.children : [];
-        let hasTimelineSibling = false;
-        for (const sib of siblings) {
-          if (sib !== block && sib.querySelector("[data-testid='cellInnerDiv']")) {
-            hasTimelineSibling = true;
-            break;
-          }
-        }
-        if (hasTimelineSibling) break;
-        // main直下まで来たら止める（安全弁）
-        if (block.closest("[role='main']") === block) break;
-      }
-      block.style.display = val;
     }
 
     // フローティングPostボタン
