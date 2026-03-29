@@ -478,30 +478,7 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // タブバー: nav要素のみ非表示（親・兄弟は触らない）
-    const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
-    if (tabNav) {
-      tabNav.style.display = val;
-    }
-
-    // 投稿エリア: 個別要素を直接非表示
-    // テキストエリアの外枠
-    const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
-    if (tweetBox) {
-      // テキストエリアから3階層上まで非表示（入力欄部分）
-      const inputArea = tweetBox.parentElement?.parentElement?.parentElement;
-      if (inputArea) inputArea.style.display = val;
-    }
-    // ツールバー（アイコン行 + Postボタン）
-    const toolbar = document.querySelector("[data-testid='primaryColumn'] [data-testid='toolBar']");
-    if (toolbar) {
-      toolbar.style.display = val;
-    }
-    // 投稿エリアのアバター画像
-    const composeAvatar = document.querySelector("[data-testid='primaryColumn'] .public-DraftEditorPlaceholder-root");
-    if (composeAvatar) {
-      composeAvatar.style.display = val;
-    }
+    // TODO: タブバー・投稿エリアの非表示は一旦無効化（原因切り分け）
 
     // フローティングPostボタン
     const postBtn = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
