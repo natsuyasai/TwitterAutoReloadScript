@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.6.0
+// @version      1.7.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -119,6 +119,20 @@
   opacity: 0.7;
 }
 
+/* ブラウザ幅が狭い時に左サイドバーを非表示にしてタイムラインを広げる */
+@media (max-width: 1280px) {
+  header[role="banner"] {
+    display: none !important;
+  }
+  /* サイドバーを含むカラムを縮める */
+  div:has(> header[role="banner"]) {
+    width: 0 !important;
+    min-width: 0 !important;
+    flex: 0 0 0px !important;
+    overflow: hidden !important;
+  }
+}
+
 `;
     const styleElement = document.createElement('style');
     styleElement.textContent = css;
@@ -133,7 +147,7 @@
     if (root) {
       root.classList.remove('faded');
     }
-    if (fadeTimerId > 0) {
+    if (fadeTimerId !== -1) {
       clearTimeout(fadeTimerId);
     }
     fadeTimerId = setTimeout(() => {
@@ -151,7 +165,7 @@
     rootArea.setAttribute('id', ROOT_CONTAINER);
     rootArea.addEventListener('mouseenter', () => {
       rootArea.classList.remove('faded');
-      if (fadeTimerId > 0) {
+      if (fadeTimerId !== -1) {
         clearTimeout(fadeTimerId);
       }
     });
