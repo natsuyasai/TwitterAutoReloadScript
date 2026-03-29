@@ -138,7 +138,7 @@
   opacity: 1;
 }
 
-/* ツイート間の余白を縮める */
+/* ツイート間・ツイート内の余白を縮める */
 [data-testid="cellInnerDiv"] {
   padding: 0 !important;
   margin: 0 !important;
@@ -146,6 +146,17 @@
 [data-testid="cellInnerDiv"] > div {
   padding: 0 !important;
   margin: 0 !important;
+}
+/* ツイート内部: コンテンツ部分のpb=11px, メディア/引用のmt=11pxを縮める */
+[data-testid="cellInnerDiv"] article [data-testid="tweetText"] {
+  margin-bottom: 2px !important;
+}
+[data-testid="cellInnerDiv"] article [lang] ~ div {
+  margin-top: 2px !important;
+}
+/* article内の最下層ラッパーのpadding-bottomを縮める */
+[data-testid="cellInnerDiv"] article > div > div > div:last-child > div:last-child {
+  padding-bottom: 2px !important;
 }
 
 `;
