@@ -140,10 +140,16 @@
 
 /* ツイート間の余白を縮める */
 [data-testid="cellInnerDiv"] {
-  padding-bottom: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 [data-testid="cellInnerDiv"] > div {
-  padding-bottom: 4px !important;
+  padding: 2px 0 !important;
+  margin: 0 !important;
+}
+/* ツイート内の区切り線の余白も詰める */
+[data-testid="cellInnerDiv"] > div > div {
+  padding-bottom: 2px !important;
 }
 
 `;
