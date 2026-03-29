@@ -20,14 +20,14 @@
   const ROOT_CONTAINER = 'userscript-root-container';
   const BUTTON_ELEMENT_ROOT_ID = 'userscript-button-container';
   const BUTTON_ID = 'userscript-auto-reload-button';
-  const SELECLTED_ELEMENT_ROOT_ID = 'userscript-selected-container';
+  const SELECTED_ELEMENT_ROOT_ID = 'userscript-selected-container';
   const SELECTED_LIST_ID = 'userscript-interval-setting';
   const STATUS_ELEMENT_ROOT_ID = 'userscript-status-container';
   const STATUS_ID = 'userscript-auto-reload-status';
 
   let currentInterval = 60;
   let isEnabled = true;
-  let isStoped = false;
+  let isStopped = false;
   let timerId = -1;
   let fadeTimerId = -1;
   const FADE_DELAY = 5000;
@@ -57,7 +57,7 @@
 }
 
 #${BUTTON_ELEMENT_ROOT_ID},
-#${SELECLTED_ELEMENT_ROOT_ID},
+#${SELECTED_ELEMENT_ROOT_ID},
 #${STATUS_ELEMENT_ROOT_ID} {
   position: relative;
   display: flex;
@@ -119,7 +119,8 @@
   opacity: 0.7;
 }
 
-/* ブラウザ幅が狭い時に左サイドバーを非表示にしてタイムラインを広げる */
+/* ブラウザ幅が狭い時に左サイドバー・投稿エリアを非表示にしてタイムラインを広げる */
+/* 対応ブラウザ: :has() は Chrome 105+, Firefox 121+, Safari 15.4+ で動作 */
 @media (max-width: 1280px) {
   header[role="banner"] {
     display: none !important;
@@ -131,15 +132,14 @@
     flex: 0 0 0px !important;
     overflow: hidden !important;
   }
-}
-
-/* 投稿エリア（「いまどうしてる？」）を非表示 */
-div:has(> [data-testid="tweetTextarea_0"]) {
-  display: none !important;
-}
-/* フローティングPostボタンを非表示 */
-a[data-testid="SideNav_NewTweet_Button"] {
-  display: none !important;
+  /* 投稿エリア（「いまどうしてる？」）を非表示 */
+  div:has(> [data-testid="tweetTextarea_0"]) {
+    display: none !important;
+  }
+  /* フローティングPostボタンを非表示 */
+  a[data-testid="SideNav_NewTweet_Button"] {
+    display: none !important;
+  }
 }
 
 `;
@@ -211,7 +211,7 @@ a[data-testid="SideNav_NewTweet_Button"] {
     if (status) {
       status.addEventListener('click', () => {
         const button = document.getElementById(BUTTON_ELEMENT_ROOT_ID);
-        const selecter = document.getElementById(SELECLTED_ELEMENT_ROOT_ID);
+        const selecter = document.getElementById(SELECTED_ELEMENT_ROOT_ID);
 
         if (button && selecter) {
           if (visibility) {
@@ -246,7 +246,7 @@ a[data-testid="SideNav_NewTweet_Button"] {
   /**
    * 切り替えボタン追加
    */
-  function addSwithButton() {
+  function addSwitchButton() {
     const buttonArea = document.createElement('div');
     buttonArea.setAttribute('id', BUTTON_ELEMENT_ROOT_ID);
     buttonArea.innerHTML = `<button id="${BUTTON_ID}" type="button">ON</button>`;
@@ -254,9 +254,9 @@ a[data-testid="SideNav_NewTweet_Button"] {
 
     const button = document.getElementById(BUTTON_ID);
     button.addEventListener('click', () => {
-      isStoped = !isStoped;
-      button.textContent = isStoped ? 'OFF' : 'ON';
-      button.style.backgroundColor = isStoped ? 'gray' : '#03A9F4';
+      isStopped = !isStopped;
+      button.textContent = isStopped ? 'OFF' : 'ON';
+      button.style.backgroundColor = isStopped ? 'gray' : '#03A9F4';
     }, false);
   }
 
@@ -277,7 +277,7 @@ a[data-testid="SideNav_NewTweet_Button"] {
       9: 600,
     });
     const selectedListArea = document.createElement('div');
-    selectedListArea.setAttribute('id', SELECLTED_ELEMENT_ROOT_ID);
+    selectedListArea.setAttribute('id', SELECTED_ELEMENT_ROOT_ID);
     selectedListArea.innerHTML = `
   <select  id="${SELECTED_LIST_ID}" name="setting" size="1">
       <option value="0">5秒</option>
@@ -309,10 +309,15 @@ a[data-testid="SideNav_NewTweet_Button"] {
    */
   function reloadTimeline() {
     // 「N件のポストを表示」バナーを探す (新しいツイートがある場合に表示される)
-    const newTweetsBanner = document.querySelector("div[role='main'] div[style*='translate'] > div > span");
-    if (newTweetsBanner && newTweetsBanner.closest('[role="button"]')) {
-      newTweetsBanner.closest('[role="button"]').click();
-      return;
+    // data-testid を優先し、フォールバックでインラインスタイルのセレクタを使用
+    const newTweetsCells = document.querySelectorAll("div[role='main'] div[role='button']");
+    for (const cell of newTweetsCells) {
+      // 新着バナーはtimelineの上部にあり、translate styleを持つ要素内に配置される
+      const hasTranslate = cell.closest("div[style*='translate']");
+      if (hasTranslate && cell.querySelector('span')) {
+        cell.click();
+        return;
+      }
     }
 
     // ホームのナビリンクをクリックしてタイムラインを更新
@@ -385,12 +390,12 @@ a[data-testid="SideNav_NewTweet_Button"] {
    * @param {number} intervalSecond
    */
   function restartInterval(intervalSecond) {
-    if (timerId > 0) {
+    if (timerId !== -1) {
       clearInterval(timerId);
     }
     timerId = setInterval(() => {
       // 停止またはスクロール中なら処理しない
-      if (isStoped) {
+      if (isStopped) {
         return;
       }
       if (isScrolling()) {
@@ -409,7 +414,7 @@ a[data-testid="SideNav_NewTweet_Button"] {
    */
   function watchURLChange() {
     const debounced = debounce(() => {
-      chnageURLState();
+      changeURLState();
     }, 500);
     const observer = new MutationObserver(debounced);
     const mainElement = document.getElementsByTagName('main');
@@ -426,7 +431,7 @@ a[data-testid="SideNav_NewTweet_Button"] {
   /**
    * URLに基づいたステータス更新
    */
-  function chnageURLState() {
+  function changeURLState() {
     if (isExecutableURL()) {
       isEnabled = isScrolling() ? false : true;
     } else {
@@ -457,7 +462,7 @@ a[data-testid="SideNav_NewTweet_Button"] {
   function init() {
     addRootContainer();
     addStatus();
-    addSwithButton();
+    addSwitchButton();
     addIntervalSetting();
     addStyle();
     addScrollEvent();
@@ -466,6 +471,6 @@ a[data-testid="SideNav_NewTweet_Button"] {
   }
 
   init();
-  chnageURLState();
+  changeURLState();
   watchURLChange();
 })();
