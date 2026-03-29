@@ -122,6 +122,12 @@
 /* タイムラインのツイート文字サイズを小さく */
 [data-testid="tweetText"] {
   font-size: 13px !important;
+  line-height: 1.15 !important;
+}
+/* ユーザー名行を縮める */
+[data-testid="User-Name"] {
+  font-size: 12px !important;
+  line-height: 1.1 !important;
 }
 
 
