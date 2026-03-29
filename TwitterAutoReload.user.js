@@ -441,34 +441,39 @@
    */
   function hideNarrowViewportElements() {
     const isNarrow = window.innerWidth <= 1280;
+    const hideOrShow = (el) => { if (el) el.style.display = isNarrow ? 'none' : ''; };
 
-    // 左サイドバーのナビゲーション（アイコン列）
-    const sidebar = document.querySelector('header[role="banner"] nav');
-    if (sidebar) {
-      sidebar.style.display = isNarrow ? 'none' : '';
-    }
+    // 左サイドバー全体（Xロゴ含む）
+    hideOrShow(document.querySelector('header[role="banner"]'));
 
     // For you / Following タブバー
-    const tablist = document.querySelector("div[role='main'] div[role='tablist']");
+    // tablist自体、またはその親の固定ヘッダーを非表示
+    const tablist = document.querySelector("[role='tablist']");
     if (tablist) {
-      tablist.style.display = isNarrow ? 'none' : '';
+      // タブバーを含む固定ヘッダー部分を探す
+      const stickyParent = tablist.closest("[aria-label]") || tablist.parentElement;
+      hideOrShow(stickyParent);
     }
 
-    // 投稿エリア（「いまどうしてる？」）
+    // 投稿エリア（「What's happening?」）
     const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
     if (tweetBox) {
-      // tweetTextarea → 親の投稿ブロック全体を非表示
-      const composeBlock = tweetBox.closest("div[role='main'] > div > div");
-      if (composeBlock) {
-        composeBlock.style.display = isNarrow ? 'none' : '';
+      // 投稿フォーム全体の包含要素を探す
+      let block = tweetBox;
+      for (let i = 0; i < 10; i++) {
+        if (!block.parentElement) break;
+        block = block.parentElement;
+        // タイムライン直前の兄弟要素レベルまで遡る
+        if (block.nextElementSibling &&
+            block.nextElementSibling.querySelector("[data-testid='cellInnerDiv']")) {
+          break;
+        }
       }
+      hideOrShow(block);
     }
 
     // フローティングPostボタン
-    const postButton = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
-    if (postButton) {
-      postButton.style.display = isNarrow ? 'none' : '';
-    }
+    hideOrShow(document.querySelector("a[data-testid='SideNav_NewTweet_Button']"));
   }
 
   /**
