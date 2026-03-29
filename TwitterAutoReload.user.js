@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.6.1
+// @version      1.6.2
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -335,7 +335,7 @@
   /**
    * 「新しいポストを表示」ボタンが出現するのを待ってクリックする
    * MutationObserver でボタンの出現を監視し、見つかり次第クリックする
-   * 最大5秒待機してタイムアウトする
+   * 最大30秒待機してタイムアウトする
    */
   function waitAndClickNewPostsButton() {
     const btn = findNewPostsButton();
@@ -353,7 +353,9 @@
       }
     });
     observer.observe(section, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), 5000);
+    setTimeout(() => {
+      observer.disconnect();
+    }, 30000);
   }
 
   /**
