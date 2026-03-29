@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.5.1
+// @version      1.7.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -17,6 +17,7 @@
 // ==/UserScript==
 (function () {
   'use strict';
+
   const ROOT_CONTAINER = 'userscript-root-container';
   const BUTTON_ELEMENT_ROOT_ID = 'userscript-button-container';
   const BUTTON_ID = 'userscript-auto-reload-button';
@@ -29,6 +30,8 @@
   let isEnabled = true;
   let isStoped = false;
   let timerId = -1;
+  let followingTabTimerId = -1;
+  const FOLLOWING_TAB_MIN_INTERVAL_SEC = 61;
 
   /**
    * スタイル適用
@@ -231,19 +234,23 @@
     setContent(selectedListArea);
 
     const listElement = document.getElementById(SELECTED_LIST_ID);
+    listElement.addEventListener('focus', () => {
+      updateIntervalSettingForTab();
+    }, false);
     listElement.addEventListener('change', (event) => {
       const value = parseInt(event.currentTarget.value, 10);
       const intervalSecond = IntervalSecond[value];
-      restartInterval(intervalSecond);
       currentInterval = intervalSecond;
+      restartInterval(intervalSecond);
     }, false);
   }
 
   /**
    * メイン処理
+   * フォロー中タブは専用タイマーで更新するためここでは対象外とする
+   * それ以外のタブはタブクリックで再取得する
    */
   function reselectTab() {
-    // 現在アクティブになっている要素を取得し、クリックイベントを発火させる
     const tabs = document.querySelectorAll("div[role='tab']");
     for (let i = 0; i < tabs.length; i++) {
       const elem = tabs[i];
@@ -251,10 +258,88 @@
         elem.hasAttribute("aria-selected") &&
         elem.getAttribute("aria-selected") === "true";
       if (isSelectedTab) {
-        elem.click();
+        if (!isFollowingTab(elem)) {
+          elem.click();
+        }
         break;
       }
     }
+  }
+
+  /**
+   * フォロー中タブか判定する
+   * フォロー中タブは aria-expanded 属性を持つ
+   * @param {HTMLElement} elem タブ要素
+   * @return {boolean}
+   */
+  function isFollowingTab(elem) {
+    return elem.hasAttribute('aria-expanded');
+  }
+
+  /**
+   * 現在フォロー中タブが選択されているか
+   * @return {boolean}
+   */
+  function isFollowingTabActive() {
+    const tabs = document.querySelectorAll("div[role='tab']");
+    for (let i = 0; i < tabs.length; i++) {
+      const elem = tabs[i];
+      if (elem.hasAttribute("aria-selected") &&
+        elem.getAttribute("aria-selected") === "true" &&
+        isFollowingTab(elem)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * フォロー中タブの状態に応じて周期選択肢を更新する
+   * フォロー中タブ選択中は1分未満の選択肢を無効化し、
+   * 現在値が1分未満なら自動的に1分に切り替える
+   */
+  function updateIntervalSettingForTab() {
+    const listElement = document.getElementById(SELECTED_LIST_ID);
+    if (!listElement) return;
+    const onFollowing = isFollowingTabActive();
+    for (const option of listElement.options) {
+      // value 0〜4 が 1分未満（5秒・10秒・15秒・30秒・45秒）
+      option.disabled = onFollowing && parseInt(option.value, 10) < 5;
+    }
+    if (onFollowing && parseInt(listElement.value, 10) < 5) {
+      listElement.value = '5'; // 1分に切り替え
+      currentInterval = 60;
+      restartInterval(currentInterval);
+    }
+  }
+
+  /**
+   * フォロー中タブの更新を誘発する
+   * フォーカスイベントを発火してX内部のrevalidateOnFocusを誘発する
+   */
+  function triggerFollowingRefresh() {
+    window.dispatchEvent(new Event('focus'));
+    console.log('Triggered following tab refresh');
+  }
+
+  /**
+   * フォロー中タブ専用の更新タイマー開始
+   * ユーザー設定の周期と最小61秒のうち大きい方を使用する
+   * @param {number} intervalSecond ユーザー設定の周期（秒）
+   */
+  function startFollowingTabInterval(intervalSecond) {
+    if (followingTabTimerId > 0) {
+      clearInterval(followingTabTimerId);
+    }
+    const effectiveInterval = Math.max(FOLLOWING_TAB_MIN_INTERVAL_SEC, intervalSecond);
+    followingTabTimerId = setInterval(() => {
+      if (isStoped || isScrolling() || !isEnabled) {
+        return;
+      }
+      if (isFollowingTabActive()) {
+        triggerFollowingRefresh();
+      }
+    }, 1000 * effectiveInterval);
   }
 
   /**
@@ -300,6 +385,7 @@
 
   /**
    * 周期リセット
+   * フォロー中タブタイマーも同時に再起動する
    * @param {number} intervalSecond
    */
   function restartInterval(intervalSecond) {
@@ -319,6 +405,7 @@
       }
       reselectTab();
     }, 1000 * intervalSecond);
+    startFollowingTabInterval(intervalSecond);
   }
 
   /**
@@ -328,6 +415,7 @@
   function watchURLChange() {
     const debounced = debounce(() => {
       chnageURLState();
+      updateIntervalSettingForTab();
     }, 500);
     const observer = new MutationObserver(debounced);
     const mainElement = document.getElementsByTagName('main');
@@ -386,5 +474,3 @@
   chnageURLState();
   watchURLChange();
 })();
-
-
