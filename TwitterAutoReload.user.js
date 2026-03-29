@@ -441,39 +441,40 @@
    */
   function hideNarrowViewportElements() {
     const isNarrow = window.innerWidth <= 1280;
-    const hideOrShow = (el) => { if (el) el.style.display = isNarrow ? 'none' : ''; };
+    const val = isNarrow ? 'none' : '';
 
-    // 左サイドバー全体（Xロゴ含む）
-    hideOrShow(document.querySelector('header[role="banner"]'));
-
-    // For you / Following タブバー
-    // tablist自体、またはその親の固定ヘッダーを非表示
-    const tablist = document.querySelector("[role='tablist']");
-    if (tablist) {
-      // タブバーを含む固定ヘッダー部分を探す
-      const stickyParent = tablist.closest("[aria-label]") || tablist.parentElement;
-      hideOrShow(stickyParent);
+    // 左サイドバー: headerは残し、中身の各子要素を非表示にする
+    const banner = document.querySelector('header[role="banner"]');
+    if (banner) {
+      banner.style.visibility = isNarrow ? 'hidden' : '';
+      banner.style.width = isNarrow ? '0' : '';
+      banner.style.minWidth = isNarrow ? '0' : '';
+      banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // 投稿エリア（「What's happening?」）
+    // For you / Following タブバー（tablist要素のみ直接非表示）
+    const tablist = document.querySelector("div[role='main'] [role='tablist']");
+    if (tablist) {
+      tablist.style.display = val;
+    }
+
+    // 投稿エリア（tweetTextarea_0を含むフォーム部分のみ非表示）
     const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
     if (tweetBox) {
-      // 投稿フォーム全体の包含要素を探す
-      let block = tweetBox;
-      for (let i = 0; i < 10; i++) {
-        if (!block.parentElement) break;
-        block = block.parentElement;
-        // タイムライン直前の兄弟要素レベルまで遡る
-        if (block.nextElementSibling &&
-            block.nextElementSibling.querySelector("[data-testid='cellInnerDiv']")) {
-          break;
-        }
+      // toolbarも含めたフォーム全体を探す（role=progressbarの近くにある）
+      const form = tweetBox.closest('[role="progressbar"]')?.parentElement
+                || tweetBox.closest('form')
+                || tweetBox.parentElement?.parentElement?.parentElement;
+      if (form) {
+        form.style.display = val;
       }
-      hideOrShow(block);
     }
 
     // フローティングPostボタン
-    hideOrShow(document.querySelector("a[data-testid='SideNav_NewTweet_Button']"));
+    const postBtn = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
+    if (postBtn) {
+      postBtn.style.display = val;
+    }
   }
 
   /**
