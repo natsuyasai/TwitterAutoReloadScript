@@ -478,32 +478,29 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // タブバー: nav[role=navigation] とその兄弟要素を非表示にする
-    // DOMパス: primaryColumn > div > div > div > div > nav[role=navigation]
-    // primaryColumnの直接の子を消すとタイムラインも消えるので、
-    // navとその兄弟（投稿エリア等）だけを個別に消す
+    // タブバー: nav要素のみ非表示（親・兄弟は触らない）
     const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
     if (tabNav) {
       tabNav.style.display = val;
-      // navの親の高さも縮める（余白対策）
-      if (tabNav.parentElement) {
-        tabNav.parentElement.style.padding = isNarrow ? '0' : '';
-      }
-      // navの兄弟要素も非表示（投稿エリアが同階層にある場合）
-      const siblings = tabNav.parentElement ? tabNav.parentElement.children : [];
-      for (const sib of siblings) {
-        if (sib !== tabNav && !sib.querySelector("[data-testid='cellInnerDiv']")) {
-          sib.style.display = val;
-        }
-      }
     }
 
-    // 投稿エリア（navと別の場所にある場合のフォールバック）
+    // 投稿エリア: 個別要素を直接非表示
+    // テキストエリアの外枠
     const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
-    if (tweetBox && isNarrow && tweetBox.offsetParent !== null) {
-      tweetBox.closest('[contenteditable]')?.parentElement?.parentElement
-        ? (tweetBox.closest('[contenteditable]').parentElement.parentElement.style.display = val)
-        : null;
+    if (tweetBox) {
+      // テキストエリアから3階層上まで非表示（入力欄部分）
+      const inputArea = tweetBox.parentElement?.parentElement?.parentElement;
+      if (inputArea) inputArea.style.display = val;
+    }
+    // ツールバー（アイコン行 + Postボタン）
+    const toolbar = document.querySelector("[data-testid='primaryColumn'] [data-testid='toolBar']");
+    if (toolbar) {
+      toolbar.style.display = val;
+    }
+    // 投稿エリアのアバター画像
+    const composeAvatar = document.querySelector("[data-testid='primaryColumn'] .public-DraftEditorPlaceholder-root");
+    if (composeAvatar) {
+      composeAvatar.style.display = val;
     }
 
     // フローティングPostボタン
