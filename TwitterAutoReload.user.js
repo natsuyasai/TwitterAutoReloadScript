@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.7.0
+// @version      1.8.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -131,6 +131,15 @@
     flex: 0 0 0px !important;
     overflow: hidden !important;
   }
+}
+
+/* 投稿エリア（「いまどうしてる？」）を非表示 */
+div:has(> [data-testid="tweetTextarea_0"]) {
+  display: none !important;
+}
+/* フローティングPostボタンを非表示 */
+a[data-testid="SideNav_NewTweet_Button"] {
+  display: none !important;
 }
 
 `;
