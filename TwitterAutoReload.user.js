@@ -478,40 +478,18 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // === デバッグ: DOM構造を詳細に出力 ===
-    if (isNarrow) {
-      const describeEl = (el) => {
-        if (!el) return 'null';
-        const tag = el.tagName;
-        const testid = el.getAttribute('data-testid') || '';
-        const role = el.getAttribute('role') || '';
-        const childCount = el.children.length;
-        return `${tag}${testid ? '[testid='+testid+']' : ''}${role ? '[role='+role+']' : ''}(children:${childCount})`;
-      };
-
-      // primaryColumnの直接の子要素を調査
-      const pc = document.querySelector("[data-testid='primaryColumn']");
-      if (pc) {
-        console.log('[userscript] primaryColumn children:');
-        for (let i = 0; i < pc.children.length; i++) {
-          const child = pc.children[i];
-          const hasTimeline = !!child.querySelector("[data-testid='cellInnerDiv']");
-          const hasTablist = !!child.querySelector("[role='tablist']");
-          const hasTweetBox = !!child.querySelector("[data-testid='tweetTextarea_0']");
-          const hasToolbar = !!child.querySelector("[data-testid='toolBar']");
-          console.log(`[userscript]   [${i}] ${describeEl(child)} timeline:${hasTimeline} tablist:${hasTablist} tweetBox:${hasTweetBox} toolbar:${hasToolbar}`);
-
-          // この子要素のさらに直接の子も出力
-          for (let j = 0; j < child.children.length; j++) {
-            const grandchild = child.children[j];
-            const gcTimeline = !!grandchild.querySelector("[data-testid='cellInnerDiv']");
-            const gcTablist = !!grandchild.querySelector("[role='tablist']");
-            const gcTweetBox = !!grandchild.querySelector("[data-testid='tweetTextarea_0']");
-            console.log(`[userscript]     [${i}.${j}] ${describeEl(grandchild)} timeline:${gcTimeline} tablist:${gcTablist} tweetBox:${gcTweetBox}`);
-          }
+    // primaryColumn > div(唯一の子) > div*5 の構造
+    // [0.0] タブバー, [0.1] 区切り, [0.2] 投稿エリア, [0.3] 区切り, [0.4] タイムライン
+    // タイムライン以外の孫要素を非表示にする
+    const pc = document.querySelector("[data-testid='primaryColumn']");
+    if (pc && pc.children[0]) {
+      const wrapper = pc.children[0];
+      for (const child of wrapper.children) {
+        if (child.querySelector("[data-testid='cellInnerDiv']")) {
+          // タイムライン本体 → スキップ
+          continue;
         }
-      } else {
-        console.log('[userscript] primaryColumn NOT found');
+        child.style.display = val;
       }
     }
 
