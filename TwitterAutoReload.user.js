@@ -486,25 +486,14 @@
       const wrapper = pc.children[0];
       const hasTimeline = wrapper.querySelector("[data-testid='cellInnerDiv']");
       if (hasTimeline) {
-        // タイムラインがロード済み → タイムライン以外を非表示
         for (const child of wrapper.children) {
           if (child.querySelector("[data-testid='cellInnerDiv']")) {
             continue;
           }
           child.style.display = val;
         }
-      } else {
-        // タイムライン未ロード → 一旦全部隠してタイムライン出現を待つ
-        wrapper.style.visibility = isNarrow ? 'hidden' : '';
-        const observer = new MutationObserver(() => {
-          if (wrapper.querySelector("[data-testid='cellInnerDiv']")) {
-            observer.disconnect();
-            wrapper.style.visibility = '';
-            hideNarrowViewportElements();
-          }
-        });
-        observer.observe(wrapper, { childList: true, subtree: true });
       }
+      // タイムライン未ロードの場合はスキップ（MutationObserverで再実行される）
     }
 
     // フローティングPostボタン
