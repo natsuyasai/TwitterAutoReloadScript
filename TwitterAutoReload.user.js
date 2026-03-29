@@ -452,22 +452,37 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // For you / Following タブバー（tablist要素のみ直接非表示）
+    // For you / Following タブバー（tablist + その親コンテナ）
     const tablist = document.querySelector("div[role='main'] [role='tablist']");
     if (tablist) {
+      // tablist自身とその直接の親（下線やパディング含む）を非表示
       tablist.style.display = val;
+      if (tablist.parentElement) {
+        tablist.parentElement.style.display = val;
+      }
     }
 
-    // 投稿エリア（tweetTextarea_0を含むフォーム部分のみ非表示）
+    // 投稿エリア全体（テキストボックス + ツールバー + Postボタン）
     const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
     if (tweetBox) {
-      // toolbarも含めたフォーム全体を探す（role=progressbarの近くにある）
-      const form = tweetBox.closest('[role="progressbar"]')?.parentElement
-                || tweetBox.closest('form')
-                || tweetBox.parentElement?.parentElement?.parentElement;
-      if (form) {
-        form.style.display = val;
+      // DOMを遡って、タイムラインのセル(cellInnerDiv)と同階層の要素を見つける
+      let block = tweetBox;
+      while (block.parentElement) {
+        block = block.parentElement;
+        // このブロックの兄弟にタイムラインがあれば、ここが投稿エリアの境界
+        const siblings = block.parentElement ? block.parentElement.children : [];
+        let hasTimelineSibling = false;
+        for (const sib of siblings) {
+          if (sib !== block && sib.querySelector("[data-testid='cellInnerDiv']")) {
+            hasTimelineSibling = true;
+            break;
+          }
+        }
+        if (hasTimelineSibling) break;
+        // main直下まで来たら止める（安全弁）
+        if (block.closest("[role='main']") === block) break;
       }
+      block.style.display = val;
     }
 
     // フローティングPostボタン
