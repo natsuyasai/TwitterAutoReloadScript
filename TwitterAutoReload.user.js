@@ -122,6 +122,7 @@
 /* タイムラインのツイート文字サイズを小さく */
 [data-testid="tweetText"] {
   font-size: 12px !important;
+  line-height: 1.3 !important;
 }
 
 
