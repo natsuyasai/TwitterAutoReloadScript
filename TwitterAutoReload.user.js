@@ -124,6 +124,26 @@
   font-size: 12px !important;
 }
 
+/* For you / Following タブバーを非表示 */
+[data-testid="ScrollSnap-List"] {
+  display: none !important;
+}
+[role="tablist"] {
+  display: none !important;
+}
+
+/* 投稿エリアを非表示 */
+[data-testid="tweetTextarea_0"] {
+  display: none !important;
+}
+[data-testid="toolBar"] {
+  display: none !important;
+}
+/* 投稿エリアのアバターとPostボタン周辺 */
+[data-testid="primaryColumn"] [data-testid="UserAvatar-Container-unknown"] {
+  display: none !important;
+}
+
 /* ツイートのアクションバーを折りたたむ（ホバーで展開） */
 [role="group"][id] {
   height: 4px !important;
