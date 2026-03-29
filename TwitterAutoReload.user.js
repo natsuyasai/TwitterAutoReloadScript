@@ -140,6 +140,10 @@
   a[data-testid="SideNav_NewTweet_Button"] {
     display: none !important;
   }
+  /* For you / Following タブバーを非表示 */
+  div[role="tablist"] {
+    display: none !important;
+  }
 }
 
 `;
