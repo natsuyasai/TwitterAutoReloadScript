@@ -527,7 +527,11 @@
     resetFadeTimer();
 
     // 狭いビューポート対応: リサイズとDOM変更を監視
+    // 初回ロード時にサイドバーやタイムラインがまだ存在しない場合があるのでリトライ
     hideNarrowViewportElements();
+    setTimeout(hideNarrowViewportElements, 1000);
+    setTimeout(hideNarrowViewportElements, 2000);
+    setTimeout(hideNarrowViewportElements, 4000);
     window.addEventListener('resize', debounce(hideNarrowViewportElements, 300));
   }
 
