@@ -122,13 +122,12 @@
 /* タイムラインのツイート文字サイズを小さく */
 [data-testid="tweetText"] {
   font-size: 12px !important;
-  line-height: 1.3 !important;
 }
 
 
 /* ツイートのアクションバーを折りたたむ（ホバーで展開） */
 [role="group"][id] {
-  height: 4px !important;
+  height: 2px !important;
   overflow: hidden !important;
   opacity: 0.3;
   transition: height 0.2s ease, opacity 0.2s ease;
