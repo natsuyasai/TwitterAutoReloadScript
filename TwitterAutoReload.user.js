@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter autoload
 // @namespace    https://github.com/natsuyasai/TwitterAutoReloadScript
-// @version      1.5.1
+// @version      1.6.0
 // @description  Automatically retrieve the latest Tweet(X's).
 // @author       natsuyasai
 // @match        https://x.com
@@ -29,6 +29,8 @@
   let isEnabled = true;
   let isStoped = false;
   let timerId = -1;
+  let fadeTimerId = -1;
+  const FADE_DELAY = 5000;
 
   /**
    * スタイル適用
@@ -41,6 +43,17 @@
   display: flex;
   top: 40px;
   left: 0;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  z-index: 9999;
+}
+
+#${ROOT_CONTAINER}.faded {
+  opacity: 0.05;
+}
+
+#${ROOT_CONTAINER}:hover {
+  opacity: 1 !important;
 }
 
 #${BUTTON_ELEMENT_ROOT_ID},
@@ -113,11 +126,38 @@
   }
 
   /**
+   * フェードタイマーをリセットして再開
+   */
+  function resetFadeTimer() {
+    const root = document.getElementById(ROOT_CONTAINER);
+    if (root) {
+      root.classList.remove('faded');
+    }
+    if (fadeTimerId > 0) {
+      clearTimeout(fadeTimerId);
+    }
+    fadeTimerId = setTimeout(() => {
+      if (root) {
+        root.classList.add('faded');
+      }
+    }, FADE_DELAY);
+  }
+
+  /**
    * ルート要素追加
    */
   function addRootContainer() {
     const rootArea = document.createElement('div');
     rootArea.setAttribute('id', ROOT_CONTAINER);
+    rootArea.addEventListener('mouseenter', () => {
+      rootArea.classList.remove('faded');
+      if (fadeTimerId > 0) {
+        clearTimeout(fadeTimerId);
+      }
+    });
+    rootArea.addEventListener('mouseleave', () => {
+      resetFadeTimer();
+    });
     document.body.appendChild(rootArea);
   }
 
@@ -241,9 +281,28 @@
 
   /**
    * メイン処理
+   * 「新しいポストを表示」バナーがあればクリック、
+   * なければホームナビリンクをクリックしてタイムラインを更新
    */
-  function reselectTab() {
-    // 現在アクティブになっている要素を取得し、クリックイベントを発火させる
+  function reloadTimeline() {
+    // 「N件のポストを表示」バナーを探す (新しいツイートがある場合に表示される)
+    const newTweetsBanner = document.querySelector("div[role='main'] div[style*='translate'] > div > span");
+    if (newTweetsBanner && newTweetsBanner.closest('[role="button"]')) {
+      newTweetsBanner.closest('[role="button"]').click();
+      return;
+    }
+
+    // ホームのナビリンクをクリックしてタイムラインを更新
+    const currentPath = location.pathname;
+    if (currentPath === '/' || currentPath === '/home') {
+      const homeLink = document.querySelector("a[href='/home'][role='link']");
+      if (homeLink) {
+        homeLink.click();
+        return;
+      }
+    }
+
+    // 通知・検索ページの場合は従来のタブクリック方式にフォールバック
     const tabs = document.querySelectorAll("div[role='tab']");
     for (let i = 0; i < tabs.length; i++) {
       const elem = tabs[i];
@@ -317,7 +376,7 @@
       if (!isEnabled) {
         return;
       }
-      reselectTab();
+      reloadTimeline();
     }, 1000 * intervalSecond);
   }
 
@@ -380,11 +439,10 @@
     addStyle();
     addScrollEvent();
     restartInterval(currentInterval);
+    resetFadeTimer();
   }
 
   init();
   chnageURLState();
   watchURLChange();
 })();
-
-
