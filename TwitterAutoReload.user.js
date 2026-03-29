@@ -124,25 +124,6 @@
   font-size: 12px !important;
 }
 
-/* For you / Following タブバーを非表示 */
-[data-testid="ScrollSnap-List"] {
-  display: none !important;
-}
-[role="tablist"] {
-  display: none !important;
-}
-
-/* 投稿エリアを非表示 */
-[data-testid="tweetTextarea_0"] {
-  display: none !important;
-}
-[data-testid="toolBar"] {
-  display: none !important;
-}
-/* 投稿エリアのアバターとPostボタン周辺 */
-[data-testid="primaryColumn"] [data-testid="UserAvatar-Container-unknown"] {
-  display: none !important;
-}
 
 /* ツイートのアクションバーを折りたたむ（ホバーで展開） */
 [role="group"][id] {
@@ -489,36 +470,31 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // For you / Following タブバー: tablist要素とその全祖先を
-    // primaryColumn内で見つかるまで遡って非表示にする
-    const tablist = document.querySelector("[data-testid='primaryColumn'] [role='tablist']");
-    if (tablist) {
-      let target = tablist;
-      while (target.parentElement) {
-        const parent = target.parentElement;
-        // primaryColumnの直接の子に到達したらそれを非表示にして終了
-        if (parent.getAttribute('data-testid') === 'primaryColumn') {
-          target.style.display = val;
-          break;
+    // For you / Following タブバー・投稿エリアの非表示
+    // DOM構造をデバッグ出力して正しいセレクタを特定する
+    if (isNarrow) {
+      const tablist = document.querySelector("[role='tablist']");
+      if (tablist) {
+        console.log('[userscript] tablist found. Path:');
+        let el = tablist;
+        const path = [];
+        while (el) {
+          const testid = el.getAttribute?.('data-testid') || '';
+          const role = el.getAttribute?.('role') || '';
+          const tag = el.tagName || '';
+          path.unshift(`${tag}${testid ? '[data-testid='+testid+']' : ''}${role ? '[role='+role+']' : ''}`);
+          el = el.parentElement;
         }
-        target = parent;
+        console.log('[userscript] ' + path.join(' > '));
       }
-      target.style.display = val;
-    }
-
-    // 投稿エリア: 同様にprimaryColumnの直接の子まで遡る
-    const tweetBox = document.querySelector("[data-testid='primaryColumn'] [data-testid='tweetTextarea_0']");
-    if (tweetBox) {
-      let target = tweetBox;
-      while (target.parentElement) {
-        const parent = target.parentElement;
-        if (parent.getAttribute('data-testid') === 'primaryColumn') {
-          target.style.display = val;
-          break;
-        }
-        target = parent;
+      const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
+      if (tweetBox) {
+        console.log('[userscript] tweetTextarea found');
+      } else {
+        console.log('[userscript] tweetTextarea NOT found');
       }
-      target.style.display = val;
+      const primaryCol = document.querySelector("[data-testid='primaryColumn']");
+      console.log('[userscript] primaryColumn:', primaryCol ? 'found' : 'NOT found');
     }
 
     // フローティングPostボタン
