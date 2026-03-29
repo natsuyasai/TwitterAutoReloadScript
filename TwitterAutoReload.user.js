@@ -478,33 +478,32 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // タブバー + 投稿エリア: navの親divを遡って非表示にする
+    // タブバー: nav[role=navigation] とその兄弟要素を非表示にする
     // DOMパス: primaryColumn > div > div > div > div > nav[role=navigation]
-    // navの親div（4層目）がタブバーと投稿エリアを両方含む可能性が高い
+    // primaryColumnの直接の子を消すとタイムラインも消えるので、
+    // navとその兄弟（投稿エリア等）だけを個別に消す
     const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
     if (tabNav) {
-      // navから遡って、primaryColumnの直接の子を見つけて非表示
-      let target = tabNav;
-      while (target.parentElement) {
-        if (target.parentElement.getAttribute('data-testid') === 'primaryColumn') {
-          target.style.display = val;
-          break;
+      tabNav.style.display = val;
+      // navの親の高さも縮める（余白対策）
+      if (tabNav.parentElement) {
+        tabNav.parentElement.style.padding = isNarrow ? '0' : '';
+      }
+      // navの兄弟要素も非表示（投稿エリアが同階層にある場合）
+      const siblings = tabNav.parentElement ? tabNav.parentElement.children : [];
+      for (const sib of siblings) {
+        if (sib !== tabNav && !sib.querySelector("[data-testid='cellInnerDiv']")) {
+          sib.style.display = val;
         }
-        target = target.parentElement;
       }
     }
 
-    // navで投稿エリアがカバーされない場合のフォールバック
+    // 投稿エリア（navと別の場所にある場合のフォールバック）
     const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
     if (tweetBox && isNarrow && tweetBox.offsetParent !== null) {
-      let target = tweetBox;
-      while (target.parentElement) {
-        if (target.parentElement.getAttribute('data-testid') === 'primaryColumn') {
-          target.style.display = val;
-          break;
-        }
-        target = target.parentElement;
-      }
+      tweetBox.closest('[contenteditable]')?.parentElement?.parentElement
+        ? (tweetBox.closest('[contenteditable]').parentElement.parentElement.style.display = val)
+        : null;
     }
 
     // フローティングPostボタン
