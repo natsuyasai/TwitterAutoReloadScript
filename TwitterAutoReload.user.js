@@ -121,7 +121,7 @@
 
 /* タイムラインのツイート文字サイズを2px小さく */
 [data-testid="tweetText"] {
-  font-size: 13px !important;
+  font-size: 12px !important;
 }
 
 `;
