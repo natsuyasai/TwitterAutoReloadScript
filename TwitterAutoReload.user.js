@@ -30,7 +30,7 @@
   let isStopped = false;
   let timerId = -1;
   let fadeTimerId = -1;
-  const FADE_DELAY = 5000;
+  const FADE_DELAY = 3000;
 
   /**
    * スタイル適用
