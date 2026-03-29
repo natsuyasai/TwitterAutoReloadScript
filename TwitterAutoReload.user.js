@@ -484,12 +484,15 @@
     const pc = document.querySelector("[data-testid='primaryColumn']");
     if (pc && pc.children[0]) {
       const wrapper = pc.children[0];
-      for (const child of wrapper.children) {
-        if (child.querySelector("[data-testid='cellInnerDiv']")) {
-          // タイムライン本体 → スキップ
-          continue;
+      // タイムラインがまだロードされていなければ何もしない（全消え防止）
+      const hasTimeline = wrapper.querySelector("[data-testid='cellInnerDiv']");
+      if (hasTimeline) {
+        for (const child of wrapper.children) {
+          if (child.querySelector("[data-testid='cellInnerDiv']")) {
+            continue;
+          }
+          child.style.display = val;
         }
-        child.style.display = val;
       }
     }
 
