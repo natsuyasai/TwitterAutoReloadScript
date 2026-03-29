@@ -138,6 +138,14 @@
   opacity: 1;
 }
 
+/* ツイート間の余白を縮める */
+[data-testid="cellInnerDiv"] {
+  padding-bottom: 0 !important;
+}
+[data-testid="cellInnerDiv"] > div {
+  padding-bottom: 4px !important;
+}
+
 `;
     const styleElement = document.createElement('style');
     styleElement.textContent = css;
@@ -470,27 +478,32 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // For you / Following タブバー: nav要素ごと非表示にする
-    // パス: primaryColumn > div > div > div > div > nav[role=navigation]
+    // タブバー + 投稿エリア: navの親divを遡って非表示にする
+    // DOMパス: primaryColumn > div > div > div > div > nav[role=navigation]
+    // navの親div（4層目）がタブバーと投稿エリアを両方含む可能性が高い
     const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
     if (tabNav) {
-      tabNav.style.display = val;
-    }
-
-    // 投稿エリア: tweetTextarea_0 の最も近い兄弟のない祖先ブロックを非表示
-    const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
-    if (tweetBox) {
-      // primaryColumnまで遡り、その直接の子を非表示
-      let target = tweetBox;
+      // navから遡って、primaryColumnの直接の子を見つけて非表示
+      let target = tabNav;
       while (target.parentElement) {
         if (target.parentElement.getAttribute('data-testid') === 'primaryColumn') {
+          target.style.display = val;
           break;
         }
         target = target.parentElement;
       }
-      // tabNavと同じブロックに投稿エリアがある可能性があるので、別ブロックのみ非表示
-      if (target !== tabNav?.parentElement) {
-        target.style.display = val;
+    }
+
+    // navで投稿エリアがカバーされない場合のフォールバック
+    const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
+    if (tweetBox && isNarrow && tweetBox.offsetParent !== null) {
+      let target = tweetBox;
+      while (target.parentElement) {
+        if (target.parentElement.getAttribute('data-testid') === 'primaryColumn') {
+          target.style.display = val;
+          break;
+        }
+        target = target.parentElement;
       }
     }
 
