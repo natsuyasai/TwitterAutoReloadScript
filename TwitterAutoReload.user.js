@@ -119,9 +119,22 @@
   opacity: 0.7;
 }
 
-/* タイムラインのツイート文字サイズを2px小さく */
+/* タイムラインのツイート文字サイズを小さく */
 [data-testid="tweetText"] {
   font-size: 12px !important;
+}
+
+/* ツイートのアクションバーを折りたたむ（ホバーで展開） */
+[role="group"][id] {
+  height: 4px !important;
+  overflow: hidden !important;
+  opacity: 0.3;
+  transition: height 0.2s ease, opacity 0.2s ease;
+}
+[role="group"][id]:hover {
+  height: auto !important;
+  overflow: visible !important;
+  opacity: 1;
 }
 
 `;
