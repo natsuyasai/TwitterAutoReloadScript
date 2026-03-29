@@ -469,13 +469,15 @@
     const isNarrow = window.innerWidth <= 1280;
     const val = isNarrow ? 'none' : '';
 
-    // 左サイドバー: headerは残し、中身の各子要素を非表示にする
-    const banner = document.querySelector('header[role="banner"]');
-    if (banner) {
-      banner.style.visibility = isNarrow ? 'hidden' : '';
-      banner.style.width = isNarrow ? '0' : '';
-      banner.style.minWidth = isNarrow ? '0' : '';
-      banner.style.overflow = isNarrow ? 'hidden' : '';
+    // 左サイドバー: 1024px以上の時だけ非表示（モバイル幅ではサイドバーは存在しない）
+    if (window.innerWidth >= 1024) {
+      const banner = document.querySelector('header[role="banner"]');
+      if (banner) {
+        banner.style.visibility = isNarrow ? 'hidden' : '';
+        banner.style.width = isNarrow ? '0' : '';
+        banner.style.minWidth = isNarrow ? '0' : '';
+        banner.style.overflow = isNarrow ? 'hidden' : '';
+      }
     }
 
     // primaryColumn > div(唯一の子) > div*5 の構造
