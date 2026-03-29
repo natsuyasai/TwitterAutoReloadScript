@@ -119,6 +119,10 @@
   opacity: 0.7;
 }
 
+/* タイムラインのツイート文字サイズを2px小さく */
+[data-testid="tweetText"] {
+  font-size: 13px !important;
+}
 
 `;
     const styleElement = document.createElement('style');
@@ -452,14 +456,19 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // For you / Following タブバー（tablist + その親コンテナ）
+    // For you / Following タブバー（tablist + 上位の固定ヘッダー）
     const tablist = document.querySelector("div[role='main'] [role='tablist']");
     if (tablist) {
-      // tablist自身とその直接の親（下線やパディング含む）を非表示
-      tablist.style.display = val;
-      if (tablist.parentElement) {
-        tablist.parentElement.style.display = val;
+      // tablist → 親 → 祖父 まで遡って非表示にする（背景・下線・パディング含む）
+      let target = tablist;
+      for (let i = 0; i < 3; i++) {
+        if (target.parentElement && target.parentElement.getAttribute('role') !== 'main') {
+          target = target.parentElement;
+        } else {
+          break;
+        }
       }
+      target.style.display = val;
     }
 
     // 投稿エリア全体（テキストボックス + ツールバー + Postボタン）
