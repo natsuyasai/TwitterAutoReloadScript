@@ -470,32 +470,29 @@
       banner.style.overflow = isNarrow ? 'hidden' : '';
     }
 
-    // For you / Following タブバー・投稿エリアの非表示
-    // 各要素から親を遡り、タイムラインと同じ親を共有する階層を見つけて非表示にする
-    const hideByWalkingUp = (startEl) => {
-      if (!startEl) return;
-      let target = startEl;
-      while (target.parentElement) {
-        // 親の子要素の中にタイムラインのセルがあるか確認
-        const parent = target.parentElement;
-        for (const sibling of parent.children) {
-          if (sibling !== target && sibling.querySelector("[data-testid='cellInnerDiv']")) {
-            // 兄弟にタイムラインがある = このtargetが非表示にすべきブロック
-            target.style.display = val;
-            return;
-          }
-        }
-        // role=main に到達したら安全弁として停止
-        if (parent.getAttribute('role') === 'main') {
-          target.style.display = val;
-          return;
-        }
-        target = parent;
-      }
-    };
+    // For you / Following タブバー: nav要素ごと非表示にする
+    // パス: primaryColumn > div > div > div > div > nav[role=navigation]
+    const tabNav = document.querySelector("[data-testid='primaryColumn'] nav[role='navigation']");
+    if (tabNav) {
+      tabNav.style.display = val;
+    }
 
-    hideByWalkingUp(document.querySelector("[role='tablist']"));
-    hideByWalkingUp(document.querySelector("[data-testid='tweetTextarea_0']"));
+    // 投稿エリア: tweetTextarea_0 の最も近い兄弟のない祖先ブロックを非表示
+    const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
+    if (tweetBox) {
+      // primaryColumnまで遡り、その直接の子を非表示
+      let target = tweetBox;
+      while (target.parentElement) {
+        if (target.parentElement.getAttribute('data-testid') === 'primaryColumn') {
+          break;
+        }
+        target = target.parentElement;
+      }
+      // tabNavと同じブロックに投稿エリアがある可能性があるので、別ブロックのみ非表示
+      if (target !== tabNav?.parentElement) {
+        target.style.display = val;
+      }
+    }
 
     // フローティングPostボタン
     const postBtn = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
