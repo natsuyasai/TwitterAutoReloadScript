@@ -119,32 +119,6 @@
   opacity: 0.7;
 }
 
-/* ブラウザ幅が狭い時に左サイドバー・投稿エリアを非表示にしてタイムラインを広げる */
-/* 対応ブラウザ: :has() は Chrome 105+, Firefox 121+, Safari 15.4+ で動作 */
-@media (max-width: 1280px) {
-  header[role="banner"] {
-    display: none !important;
-  }
-  /* サイドバーを含むカラムを縮める */
-  div:has(> header[role="banner"]) {
-    width: 0 !important;
-    min-width: 0 !important;
-    flex: 0 0 0px !important;
-    overflow: hidden !important;
-  }
-  /* 投稿エリア（「いまどうしてる？」）を非表示 */
-  div:has(> [data-testid="tweetTextarea_0"]) {
-    display: none !important;
-  }
-  /* フローティングPostボタンを非表示 */
-  a[data-testid="SideNav_NewTweet_Button"] {
-    display: none !important;
-  }
-  /* For you / Following タブバーを非表示 */
-  div[role="tablist"] {
-    display: none !important;
-  }
-}
 
 `;
     const styleElement = document.createElement('style');
@@ -419,6 +393,7 @@
   function watchURLChange() {
     const debounced = debounce(() => {
       changeURLState();
+      hideNarrowViewportElements();
     }, 500);
     const observer = new MutationObserver(debounced);
     const mainElement = document.getElementsByTagName('main');
@@ -461,6 +436,42 @@
   }
 
   /**
+   * 狭いビューポート時に不要なUI要素を非表示にする
+   * CSSではなくJSで個別要素を直接操作し、レイアウト崩れを防ぐ
+   */
+  function hideNarrowViewportElements() {
+    const isNarrow = window.innerWidth <= 1280;
+
+    // 左サイドバーのナビゲーション（アイコン列）
+    const sidebar = document.querySelector('header[role="banner"] nav');
+    if (sidebar) {
+      sidebar.style.display = isNarrow ? 'none' : '';
+    }
+
+    // For you / Following タブバー
+    const tablist = document.querySelector("div[role='main'] div[role='tablist']");
+    if (tablist) {
+      tablist.style.display = isNarrow ? 'none' : '';
+    }
+
+    // 投稿エリア（「いまどうしてる？」）
+    const tweetBox = document.querySelector("[data-testid='tweetTextarea_0']");
+    if (tweetBox) {
+      // tweetTextarea → 親の投稿ブロック全体を非表示
+      const composeBlock = tweetBox.closest("div[role='main'] > div > div");
+      if (composeBlock) {
+        composeBlock.style.display = isNarrow ? 'none' : '';
+      }
+    }
+
+    // フローティングPostボタン
+    const postButton = document.querySelector("a[data-testid='SideNav_NewTweet_Button']");
+    if (postButton) {
+      postButton.style.display = isNarrow ? 'none' : '';
+    }
+  }
+
+  /**
    * 初期設定
    */
   function init() {
@@ -472,6 +483,10 @@
     addScrollEvent();
     restartInterval(currentInterval);
     resetFadeTimer();
+
+    // 狭いビューポート対応: リサイズとDOM変更を監視
+    hideNarrowViewportElements();
+    window.addEventListener('resize', debounce(hideNarrowViewportElements, 300));
   }
 
   init();
